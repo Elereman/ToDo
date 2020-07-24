@@ -1,4 +1,4 @@
-import 'package:ToDo/pages/home_page.dart';
+import 'package:ToDo/view/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,7 +13,7 @@ class ToDoApp extends StatelessWidget {
         primaryColor: Colors.green,
         accentColor: Colors.green[300],
       ),
-      title: "ToDo Application",
+      title: 'ToDo Application',
       home: HomePage(),
     );
   }
