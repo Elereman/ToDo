@@ -1,22 +1,34 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:ToDo/blocs/events.dart';
+import 'package:ToDo/blocs/states.dart' as states;
+import 'package:ToDo/blocs/states.dart';
+import 'package:ToDo/models/mock_task_repository.dart';
 import 'package:ToDo/models/task.dart';
-import 'package:ToDo/view/widgets/task_widget.dart';
+import 'package:ToDo/models/task_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 
 class HomePageBloc {
-  final StreamController<Event> _eventStreamController;
-  final StreamController<State> _stateStreamController;
+  final BehaviorSubject<Event> _eventStreamController;
+  final BehaviorSubject<states.State> _stateStreamController;
+  final TaskRepository _repository;
+
+  List colors = [Colors.red, Colors.green, Colors.yellow, Colors.blue,
+    Colors.amber, Colors.cyan];
+  Random random = new Random();
 
   HomePageBloc()
-      : _eventStreamController = StreamController<Event>(),
-        _stateStreamController = StreamController<State>() {
+      : _eventStreamController = BehaviorSubject<Event>(),
+        _stateStreamController = BehaviorSubject<states.State>(),
+        _repository = MockTaskRepository() {
     _eventStreamController.stream.listen((event) => _handleEvent(event));
   }
 
-  Stream<State> get stateStream => _stateStreamController.stream;
+  Stream<states.State> get stateStream => _stateStreamController.stream;
 
   Sink<Event> get eventSink => _eventStreamController.sink;
 
@@ -25,43 +37,51 @@ class HomePageBloc {
       case AddTaskButtonPressedEvent:
         print('TaskButtonPressed');
         AddTaskButtonPressedEvent _event = event as AddTaskButtonPressedEvent;
-        _stateStreamController.add(TaskWidgetCreatedState(SimpleTaskWidget(
-          task: _event.task,
-          description: _event.description,
-          color: Colors.blueAccent,
-        )));
+        _repository.create(_event.task);
+        _stateStreamController.add(TaskWidgetCreatedState(
+            Task(1,_event.task.task,_event.task.description)
+        ));
+        break;
+
+      case TaskPressedEvent:
+        print('TaskPressed');
+        _stateStreamController.add(PressedState<bool>(true));
+        break;
+
+      case TaskLongPressedEvent:
+        print('TaskLongPressed');
+        _stateStreamController.add(PressedState<bool>(true));
         break;
     }
   }
 }
 
-abstract class State<T> with _GetRuntimeType {
-  T get stateData;
-}
-
-abstract class Event with _GetRuntimeType {}
-
 class AddTaskButtonPressedEvent extends Event {
-  final Task taskO;
+  final Task task;
 
-  AddTaskButtonPressedEvent({@required this.taskO});
+  AddTaskButtonPressedEvent({@required this.task});
 
   AddTaskButtonPressedEvent.fromStrings({String task, String description}) :
-      this(taskO: Task(1, task, description));
+        this(task: Task(1, task, description));
 
-  String get task => taskO.task;
-  String get description => taskO.description;
+  String get taskText => task.task;
+  String get description => task.description;
 }
 
-class TaskWidgetCreatedState<T> extends State {
-  final T _data;
+class PressedState<T> extends states.State {
+  final T state;
 
-  TaskWidgetCreatedState(this._data);
+  PressedState(this.state);
 
   @override
-  T get stateData => _data;
+  get stateData => state;
 }
 
-mixin _GetRuntimeType {
-  Type get type => this.runtimeType;
+class LongPressedState<T> extends states.State {
+  final T state;
+
+  LongPressedState(this.state);
+
+  @override
+  get stateData => state;
 }

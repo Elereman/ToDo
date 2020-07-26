@@ -9,4 +9,5 @@ class Task {
   bool get isComplete => isCompleted;
   String get task => _task;
   String get description => _taskDescription;
+  int get id => _id;
 }

@@ -1,13 +1,30 @@
+import 'package:ToDo/blocs/states.dart' as states;
+import 'package:ToDo/blocs/events.dart';
+import 'package:ToDo/blocs/home_page_bloc.dart';
+import 'package:ToDo/models/task.dart';
+import 'package:ToDo/view/widgets/task_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class TaskWidget extends StatelessWidget {}
 
 class SimpleTaskWidget extends TaskWidget {
-  final String task, description;
-  final Color color;
+  Color color;
+  final HomePageBloc bloc;
+  final Widget dialog;
+  final Task task;
 
-  SimpleTaskWidget({@required this.task, @required this.description, @required this.color});
+  String taskText, description;
+  bool _checkboxValue = false;
+
+  SimpleTaskWidget
+      ({@required this.color,
+      @required this.bloc,
+      @required this.dialog,
+      @required this.task}) {
+    taskText = task.task;
+    description = task.description;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,34 +35,77 @@ class SimpleTaskWidget extends TaskWidget {
         child: Container(
           color: color,
           width: double.infinity,
-          child: Row(
-            children: [
-              Spacer(
-                flex: 1,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    task,
-                  ),
-                  Text(
-                    description,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-              Spacer(
-                flex: 27,
-              ),
-              Checkbox(
-                value: false,
-                onChanged: null,
-              ),
-            ],
+          child: FlatButton(
+            onPressed: () {
+              _sendEventToBloc(TaskPressedEvent());
+              _checkboxValue = !_checkboxValue;
+            },
+            onLongPress: () {
+              showDialog(context: context, child: dialog).then((value) {
+                TaskDialog dialog = value as TaskDialog;
+                taskText = dialog.task;
+                description = dialog.description;
+                color = dialog.color;
+                _sendEventToBloc(TaskLongPressedEvent(
+                  taskO: Task(task.id, taskText, description),
+                ));
+              });
+            },
+            child: StreamBuilder<states.State>(
+              stream: bloc.stateStream,
+              builder: (context, snapshot) {
+                return Row(
+                  children: [
+                    Spacer(
+                      flex: 1,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          taskText,
+                        ),
+                        Text(
+                          description,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    Spacer(
+                      flex: 27,
+                    ),
+                    Checkbox(
+                      value: _checkboxValue,
+                      onChanged: null,
+                    ),
+                  ],
+                );
+              }
+            ),
           ),
         ),
       ),
     );
+  }
+
+  bool getBoolFromSnapshot(AsyncSnapshot snapshot) {
+    print(snapshot.data.runtimeType);
+    if (snapshot.hasData) {
+      states.State _state = snapshot.data;
+      switch (_state.runtimeType) {
+        case PressedState:
+          print('tps');
+          break;
+
+        case LongPressedState:
+          print('tlps');
+          break;
+      }
+    }
+    return false;
+  }
+
+  void _sendEventToBloc(Event event) {
+    bloc.eventSink.add(event);
   }
 }
