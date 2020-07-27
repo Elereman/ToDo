@@ -1,3 +1,4 @@
+import 'package:ToDo/blocs/home_page_bloc.dart';
 import 'package:ToDo/view/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,9 @@ class ToDoApp extends StatelessWidget {
         accentColor: Colors.green[300],
       ),
       title: 'ToDo Application',
-      home: HomePage(),
+      home: HomePage(
+        hbloc: HomePageBloc(),
+      ),
     );
   }
 }

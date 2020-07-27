@@ -11,14 +11,14 @@ abstract class TaskWidget extends StatelessWidget {}
 class SimpleTaskWidget extends TaskWidget {
   Color color;
   final HomePageBloc bloc;
-  final Widget dialog;
+  final TaskDialog dialog;
   final Task task;
 
-  String taskText, description;
+  String taskText, description = '';
   bool _checkboxValue = false;
 
-  SimpleTaskWidget
-      ({@required this.color,
+  SimpleTaskWidget(
+      {@required this.color,
       @required this.bloc,
       @required this.dialog,
       @required this.task}) {
@@ -32,29 +32,32 @@ class SimpleTaskWidget extends TaskWidget {
       padding: EdgeInsets.all(4.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
-        child: Container(
-          color: color,
-          width: double.infinity,
-          child: FlatButton(
-            onPressed: () {
-              _sendEventToBloc(TaskPressedEvent());
-              _checkboxValue = !_checkboxValue;
-            },
-            onLongPress: () {
-              showDialog(context: context, child: dialog).then((value) {
-                TaskDialog dialog = value as TaskDialog;
-                taskText = dialog.task;
-                description = dialog.description;
-                color = dialog.color;
-                _sendEventToBloc(TaskLongPressedEvent(
-                  taskO: Task(task.id, taskText, description),
-                ));
-              });
-            },
-            child: StreamBuilder<states.State>(
-              stream: bloc.stateStream,
-              builder: (context, snapshot) {
-                return Row(
+        child: StreamBuilder<states.State>(
+          stream: bloc.stateStream,
+          builder: (context, snapshot) {
+            return Container(
+              color: color,
+              width: double.infinity,
+              child: FlatButton(
+                onPressed: () {
+                  _sendEventToBloc(TaskPressedEvent());
+                  _checkboxValue = !_checkboxValue;
+                },
+                onLongPress: () {
+                  dialog.color = color;
+                  dialog.task = taskText;
+                  dialog.description = description;
+                  showDialog(context: context, child: dialog).then((value) {
+                    TaskDialog dialog = value as TaskDialog;
+                    taskText = dialog.getTask;
+                    description = dialog.getDescription;
+                    color = dialog.color;
+                    _sendEventToBloc(TaskLongPressedEvent(
+                      taskO: Task(task.id, taskText, description, color.value),
+                    ));
+                  });
+                },
+                child: Row(
                   children: [
                     Spacer(
                       flex: 1,
@@ -65,9 +68,13 @@ class SimpleTaskWidget extends TaskWidget {
                         Text(
                           taskText,
                         ),
-                        Text(
-                          description,
-                          style: TextStyle(color: Colors.grey),
+                        Wrap(
+                          children: [
+                            Text(
+                              description,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -79,10 +86,10 @@ class SimpleTaskWidget extends TaskWidget {
                       onChanged: null,
                     ),
                   ],
-                );
-              }
-            ),
-          ),
+                ),
+              ),
+            );
+          }
         ),
       ),
     );

@@ -33,4 +33,16 @@ class TaskSharedPreferencesRepository implements TaskRepository{
     throw UnimplementedError();
   }
 
+  @override
+  Future<void> initialyze() {
+    // TODO: implement initialyze
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Task>> getAll() {
+    // TODO: implement getAll
+    throw UnimplementedError();
+  }
+
 }

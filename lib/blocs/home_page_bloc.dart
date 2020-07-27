@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart' as states;
@@ -17,10 +16,6 @@ class HomePageBloc {
   final BehaviorSubject<states.State> _stateStreamController;
   final TaskRepository _repository;
 
-  List colors = [Colors.red, Colors.green, Colors.yellow, Colors.blue,
-    Colors.amber, Colors.cyan];
-  Random random = new Random();
-
   HomePageBloc()
       : _eventStreamController = BehaviorSubject<Event>(),
         _stateStreamController = BehaviorSubject<states.State>(),
@@ -34,12 +29,21 @@ class HomePageBloc {
 
   void _handleEvent(Event event) {
     switch (event.type) {
+      case HomePageInitializedEvent:
+        print('HomePageInitialized');
+        HomePageInitializedEvent _event = event as HomePageInitializedEvent;
+        _repository.initialyze();
+        _stateStreamController.add(HomePageInitializedState(
+          _repository.getAll(),
+        ));
+        break;
+
       case AddTaskButtonPressedEvent:
         print('TaskButtonPressed');
         AddTaskButtonPressedEvent _event = event as AddTaskButtonPressedEvent;
         _repository.create(_event.task);
         _stateStreamController.add(TaskWidgetCreatedState(
-            Task(1,_event.task.task,_event.task.description)
+            Task(1,_event.task.task,_event.task.description,_event.task.color)
         ));
         break;
 
@@ -61,11 +65,23 @@ class AddTaskButtonPressedEvent extends Event {
 
   AddTaskButtonPressedEvent({@required this.task});
 
-  AddTaskButtonPressedEvent.fromStrings({String task, String description}) :
-        this(task: Task(1, task, description));
+  AddTaskButtonPressedEvent.fromStrings({String task, String description, int colorHex}) :
+        this(task: Task(1, task, description, colorHex));
 
   String get taskText => task.task;
   String get description => task.description;
+}
+
+class HomePageInitializedEvent extends Event {
+}
+
+class HomePageInitializedState<T> extends states.State {
+  final T data;
+
+  HomePageInitializedState(this.data);
+
+  @override
+  get stateData => throw UnimplementedError();
 }
 
 class PressedState<T> extends states.State {

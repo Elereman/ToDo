@@ -4,14 +4,17 @@ class ColorChoose extends StatelessWidget {
   final List<Color> colors;
   final void Function(Color) function;
   final String label;
+  final Color defaultColor;
 
-  Color _color = Colors.cyan;
+  Color color;
 
   ColorChoose(
       {Key key,
       @required this.colors,
       @required this.function,
-      @required this.label})
+      @required this.label,
+      @required this.defaultColor,
+      this.color: Colors.cyan})
       : super(key: key);
 
   @override
@@ -34,12 +37,12 @@ class ColorChoose extends StatelessWidget {
               children: [..._generateFromColors(colors)],
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal : 8.0),
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
                 children: [
                   MaterialButton(
                     onPressed: () {
-                      function(_color);
+                      function(color);
                       _closeDialog(context);
                     },
                     color: Colors.green,
@@ -47,7 +50,10 @@ class ColorChoose extends StatelessWidget {
                   ),
                   Spacer(),
                   MaterialButton(
-                    onPressed: () => _closeDialog(context),
+                    onPressed: () {
+                      color = defaultColor;
+                      _closeDialog(context);
+                    },
                     color: Colors.red,
                     child: Text('Cancel'),
                   ),
@@ -64,13 +70,12 @@ class ColorChoose extends StatelessWidget {
     Navigator.of(context, rootNavigator: true).pop(this);
   }
 
-  List<RaisedButton> _generateFromColors(
-      List<Color> colors) {
+  List<RaisedButton> _generateFromColors(List<Color> colors) {
     List<RaisedButton> result = [];
     colors.forEach((element) {
       MaterialButton button;
       button = RaisedButton(
-        onPressed: () => _color = element,
+        onPressed: () => color = element,
         color: element,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       );
@@ -79,5 +84,5 @@ class ColorChoose extends StatelessWidget {
     return result;
   }
 
-  Color get chosenColor => _color;
+  Color get chosenColor => color;
 }
