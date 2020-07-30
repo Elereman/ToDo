@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart' as states;
 import 'package:ToDo/blocs/task_dialog_bloc.dart' as tbloc;
@@ -11,19 +9,20 @@ class TaskDialog extends StatelessWidget {
   final String dialogText;
   final tbloc.TaskDialogBloc bloc;
 
-  final taskController = TextEditingController();
-  final descriptionController = TextEditingController();
+  final TextEditingController taskController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
 
   String task, description;
   Color color;
 
-  TaskDialog({Key key,
+  TaskDialog({
     @required this.onSaveButton,
     @required this.dialogText,
     @required this.bloc,
-    this.color : Colors.cyan,
-    this.task : '',
-    this.description : ''}) : super(key: key);
+    Key key,
+    this.color = Colors.cyan,
+    this.task = '',
+    this.description = ''}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,55 +31,56 @@ class TaskDialog extends StatelessWidget {
     return Dialog(
       child: SingleChildScrollView(
         child: Container(
-          height: 160,
+          height: 170,
           child: Column(
-            children: [
+            children: <Widget>[
               Text(dialogText),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal : 8.0),
+                padding: const EdgeInsets.symmetric(horizontal : 8.0),
                 child: TextField(
                   controller: taskController,
-                  onChanged: (value) => task = value,
-                  decoration: InputDecoration(
+                  onChanged: (String value) => task = value,
+                  decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Enter a task'
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal : 8.0),
+                padding: const EdgeInsets.symmetric(horizontal : 8.0),
                 child: TextField(
                   controller: descriptionController,
-                  onChanged: (value) => description = value,
-                  decoration: InputDecoration(
+                  onChanged: (String value) => description = value,
+                  decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Enter a description'
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal : 8.0),
+                padding: const EdgeInsets.symmetric(horizontal : 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
+                  children: <Widget>[
                     MaterialButton(
                       color: Colors.greenAccent,
-                      child: Text('save'),
+                      child: const Text('save'),
                       onPressed: () {
-                        this.onSaveButton(taskController.text, descriptionController.text, color.value);
+                        onSaveButton(taskController.text, descriptionController.text, color.value);
                         _closeDialog(context);
                       },
                     ),
-                    Spacer(),
-                    StreamBuilder<states.State>(
+                    const Spacer(),
+                    StreamBuilder<states.State<dynamic>>(
                       stream: bloc.stateStream,
-                      builder: (context, snapshot) {
+                      builder: (BuildContext context,
+                          AsyncSnapshot<states.State<dynamic>> snapshot) {
                         color = _getColorFromSnapshot(snapshot);
                         return MaterialButton(
                           color: color,
-                          child: Text('color'),
+                          child: const Text('color'),
                           onPressed: () {
-                            _showColorPicker(context).then((value) {
+                            _showColorPicker(context).then((ColorChoose value) {
                               color = value.chosenColor;
                               _sendColorChangedToBloc(color);
                             });
@@ -88,10 +88,10 @@ class TaskDialog extends StatelessWidget {
                         );
                       }
                     ),
-                    Spacer(),
+                    const Spacer(),
                     MaterialButton(
                       color: Colors.redAccent,
-                      child: Text('cancel'),
+                      child: const Text('cancel'),
                       onPressed: () => _closeDialog(context),
                     ),
                   ],
@@ -109,30 +109,32 @@ class TaskDialog extends StatelessWidget {
     this.color = color;
   }
 
-  Future<dynamic> _showColorPicker(BuildContext context) async {
-    return showDialog(
+  Future<ColorChoose> _showColorPicker(BuildContext context) async {
+    return showDialog<ColorChoose>(
       context: context,
       child: ColorChoose(
         defaultColor: color,
         color: color,
         label: 'Chose color',
-        colors: [
+        colors: <Color>[
           Colors.yellow,
           Colors.green,
           Colors.red,
           Colors.blue,
           Colors.orange,
+          Colors.blueAccent,
         ],
         function: changeColor,
       ),
     );
   }
 
-  Color _getColorFromSnapshot(AsyncSnapshot snapshot) {
+  Color _getColorFromSnapshot(AsyncSnapshot<states.State<dynamic>> snapshot) {
     if (snapshot.hasData) {
       print(snapshot.data);
       if(snapshot.data is tbloc.ColorChangedState<int>) {
-        tbloc.ColorChangedState<int> colorChange = snapshot.data as tbloc.ColorChangedState<int>;
+        final tbloc.ColorChangedState<int> colorChange = snapshot.data
+        as tbloc.ColorChangedState<int>;
         return Color(colorChange.data);
       }
     }
@@ -148,7 +150,7 @@ class TaskDialog extends StatelessWidget {
   }
 
   void _sendColorChangedToBloc(Color color) {
-    _sendEventToBloc(tbloc.ColorChangedEvent(color));
+    _sendEventToBloc(tbloc.ColorChangedEvent(color.value));
   }
 
   String get getTask => task;

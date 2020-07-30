@@ -9,114 +9,115 @@ import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
   final bloc.HomePageBloc hbloc;
-  List<Widget> widgets = [];
+  final List<Widget> _widgets = <SimpleTaskWidget>[];
+  final TaskDialogBloc _taskBloc = TaskDialogBloc();
+  Color _chosenColor = Colors.cyan;
 
-  HomePage({Key key, @required this.hbloc}) : super(key: key) {
+  HomePage({@required this.hbloc, Key key}) : super(key: key) {
     hbloc.eventSink.add(bloc.HomePageInitializedEvent());
-    print('sdadasdasdasdadasdasdasd');
-    hbloc.stateStream.first.then((value) {
+    hbloc.stateStream.first.then((states.State<dynamic> value) {
       print(value.runtimeType);
 
-      bloc.HomePageInitializedState state =
-          value as bloc.HomePageInitializedState;
+      final bloc.HomePageInitializedState<List<Task>> state =
+          value as bloc.HomePageInitializedState<List<Task>>;
 
-      Future<List<Task>> tasks = state.data as Future<List<Task>>;
-      tasks.then((value) {
-        value.forEach((element) {
-          print(element);
-          widgets.add(
-            SimpleTaskWidget(
-              bloc: hbloc,
-              color: Color(element.color),
-              task: element,
-              dialog: TaskDialog(
-                onSaveButton: null,
-                dialogText: 'Create new task',
-                bloc: TaskDialogBloc(),
-              ),
+      final List<Task> tasks = state.data;
+      tasks.forEach((Task element) {
+        print(element);
+        _widgets.add(
+          SimpleTaskWidget(
+            bloc: hbloc,
+            color: Color(element.color),
+            task: element,
+            onDissmised: _deleteTaskWidget,
+            dialog: TaskDialog(
+              onSaveButton: _sendTaskToBloc,
+              dialogText: 'Create new task',
+              bloc: TaskDialogBloc(),
             ),
-          );
-        });
+          ),
+        );
       });
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    print('Build called');
-    TaskDialogBloc _taskBloc = TaskDialogBloc();
-    Color _chosenColor = Colors.cyan;
+  void _deleteTaskWidget(Widget widget) {
+    _widgets.remove(widget);
+  }
 
-    void _sendEventToBloc(Event event) {
-      hbloc.eventSink.add(event);
-    }
+  void _sendEventToBloc(Event event) {
+    hbloc.eventSink.add(event);
+  }
 
-    void _sendTaskToBloc(String task, description, int colorHex) {
-      _sendEventToBloc(bloc.AddTaskButtonPressedEvent.fromStrings(
-        task: task,
-        description: description,
-        colorHex: colorHex,
-      ));
-    }
+  void _sendTaskToBloc(String task, String description, int colorHex) {
+    _sendEventToBloc(bloc.AddTaskButtonPressedEvent.fromStrings(
+      task: task,
+      description: description,
+      colorHex: colorHex,
+    ));
+  }
 
-    void _sendEditedTaskToBloc(String task, String description, int colorHex) {
-      _sendEventToBloc(bloc.AddTaskButtonPressedEvent.fromStrings(
-        task: task,
-        description: description,
-        colorHex: colorHex,
-      ));
-    }
+  void _sendEditedTaskToBloc(String task, String description, int colorHex) {
+    _sendEventToBloc(bloc.AddTaskButtonPressedEvent.fromStrings(
+      task: task,
+      description: description,
+      colorHex: colorHex,
+    ));
+  }
 
-    void addWidgetFromSnapshot(AsyncSnapshot snapshot) {
-      print(snapshot.data.runtimeType);
-      if (snapshot.hasData) {
-        if (snapshot.data is states.TaskWidgetCreatedState<Task>) {
-          states.State _state =
-              snapshot.data as states.TaskWidgetCreatedState<Task>;
-          Task _task = _state.stateData as Task;
-          widgets.add(SimpleTaskWidget(
-            bloc: hbloc,
-            color: _chosenColor,
-            task: _task,
-            dialog: TaskDialog(
-              onSaveButton: _sendTaskToBloc,
-              dialogText: 'Edit task',
-              bloc: _taskBloc,
-            ),
-          ));
-        }
+  void _addWidgetFromSnapshot(AsyncSnapshot<states.State<dynamic>> snapshot) {
+    print(snapshot.data.runtimeType);
+    if (snapshot.hasData) {
+      if (snapshot.data is states.TaskWidgetCreatedState<Task>) {
+        final states.State<Task> _state =
+            snapshot.data as states.TaskWidgetCreatedState<Task>;
+        final Task _task = _state.stateData;
+        _widgets.add(SimpleTaskWidget(
+          onDissmised: _deleteTaskWidget,
+          bloc: hbloc,
+          color: _chosenColor,
+          task: _task,
+          dialog: TaskDialog(
+            onSaveButton: _sendTaskToBloc,
+            dialogText: 'Edit task',
+            bloc: _taskBloc,
+          )
+        ));
       }
     }
+  }
 
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Task\'s'),
+        title: const Text('Task\'s'),
       ),
-      body: StreamBuilder<states.State>(
+      body: StreamBuilder<states.State<dynamic>>(
           stream: hbloc.stateStream,
-          builder: (context, snapshot) {
-            addWidgetFromSnapshot(snapshot);
+          builder: (BuildContext context,
+              AsyncSnapshot<states.State<dynamic>> snapshot) {
+            _addWidgetFromSnapshot(snapshot);
             return SingleChildScrollView(
               child: Column(
-                children: widgets,
+                children: _widgets,
               ),
             );
           }),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
-          TaskDialog _taskDialog = TaskDialog(
+          final TaskDialog _taskDialog = TaskDialog(
             onSaveButton: _sendTaskToBloc,
             dialogText: 'Create new task',
             bloc: _taskBloc,
           );
-          showDialog(context: context, child: _taskDialog).then((value) {
+          showDialog<TaskDialog>(context: context, child: _taskDialog)
+              .then((TaskDialog value) {
             if (value != null) {
-              TaskDialog dialog = value as TaskDialog;
-              _chosenColor = dialog.color;
-              print(dialog.color);
+              _chosenColor = value.color;
+              print(value.color);
             }
           });
         },

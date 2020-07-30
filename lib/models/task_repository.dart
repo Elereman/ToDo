@@ -1,7 +1,7 @@
 import 'package:ToDo/models/task.dart';
 
 abstract class TaskRepository {
-  Future<void> initialyze(){}
+  Future<void> initialize(){}
   Future<List<Task>> getAll() {}
   Future<bool> create(Task task) {}
   Future<bool> update(Task task) {}

@@ -1,31 +1,35 @@
+import 'dart:convert';
+
 import 'package:ToDo/models/task.dart';
 import 'package:ToDo/models/task_repository.dart';
 
 class MockTaskRepository implements TaskRepository {
-  Map<int, Task> _tasks = {
-    0: Task(0, '123', 'csadfsafdasf', 0xff00bcd4),
-    1: Task(1, '567', 'zxcvxzcvxczvzx', 0xff00bcd4),
-    2: Task(2, 'dfgd', 'sadfsadfsadfasdf', 0xff00bcd4),
-    3: Task(3, 'xcxzczx', 'xopiopuipuiopui', 0xff00bcd4),
+  final Map<int, Task> _tasks = {
+    0: Task('123', 'csadfsafdasf', 0xff00bcd4),
+    1: Task('567', 'zxcvxzcvxczvzx', 0xff00bcd4),
+    2: Task('dfgd', 'sadfsadfsadfasdf', 0xff00bcd4),
+    3: Task('xcxzczx', 'xopiopuipuiopui', 0xff00bcd4),
   };
 
   @override
   Future<bool> create(Task task) {
-    _tasks.putIfAbsent(task.id, () => task);
+    JsonCodec _codec = JsonCodec();
+    print(_codec.encode([task]));
+    _tasks.putIfAbsent(task.TaskID, () => task);
   }
 
   @override
   Future<bool> delete(Task task) {
-    _tasks.remove(task.id);
+    _tasks.remove(task.TaskID);
   }
 
   @override
   Future<bool> update(Task task) {
-    _tasks.update(task.id, (value) => task);
+    _tasks.update(task.TaskID, (value) => task);
   }
 
   @override
-  Future<void> initialyze() {
+  Future<void> initialize() {
     print('Initialized');
   }
 

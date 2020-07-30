@@ -3,56 +3,64 @@ import 'dart:async';
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart' as states;
 import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/models/mock_task_repository.dart';
+import 'package:ToDo/models/file_system_repository.dart';
 import 'package:ToDo/models/task.dart';
 import 'package:ToDo/models/task_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-
 class HomePageBloc {
   final BehaviorSubject<Event> _eventStreamController;
-  final BehaviorSubject<states.State> _stateStreamController;
+  final BehaviorSubject<states.State<dynamic>> _stateStreamController;
   final TaskRepository _repository;
 
   HomePageBloc()
       : _eventStreamController = BehaviorSubject<Event>(),
-        _stateStreamController = BehaviorSubject<states.State>(),
-        _repository = MockTaskRepository() {
-    _eventStreamController.stream.listen((event) => _handleEvent(event));
+        _stateStreamController = BehaviorSubject<states.State<dynamic>>(),
+        _repository = FileSystemRepository() {
+    _eventStreamController.stream.listen((Event event) => _handleEvent(event));
   }
 
-  Stream<states.State> get stateStream => _stateStreamController.stream;
+  Stream<states.State<dynamic>> get stateStream => _stateStreamController.stream;
 
   Sink<Event> get eventSink => _eventStreamController.sink;
 
-  void _handleEvent(Event event) {
+  Future<void> _handleEvent(Event event) async {
     switch (event.type) {
       case HomePageInitializedEvent:
         print('HomePageInitialized');
-        HomePageInitializedEvent _event = event as HomePageInitializedEvent;
-        _repository.initialyze();
-        _stateStreamController.add(HomePageInitializedState(
-          _repository.getAll(),
-        ));
+        _repository.initialize().then((value) async {
+          _stateStreamController
+              .add(HomePageInitializedState<List<Task>>(await _repository.getAll()));
+        });
         break;
 
       case AddTaskButtonPressedEvent:
         print('TaskButtonPressed');
-        AddTaskButtonPressedEvent _event = event as AddTaskButtonPressedEvent;
+        final AddTaskButtonPressedEvent _event = event as AddTaskButtonPressedEvent;
         _repository.create(_event.task);
-        _stateStreamController.add(TaskWidgetCreatedState(
-            Task(1,_event.task.task,_event.task.description,_event.task.color)
-        ));
+        _stateStreamController.add(TaskWidgetCreatedState<Task>(Task(
+            _event.task.task, _event.task.description, _event.task.color)));
+        break;
+
+      case TaskDeletedEvent:
+        print('TaskDeleted');
+        final TaskDeletedEvent _event = event as TaskDeletedEvent;
+        _repository.delete(_event.task);
+        _stateStreamController.add(TaskDeletedState<bool>(true));
         break;
 
       case TaskPressedEvent:
+        final TaskPressedEvent _event = event as TaskPressedEvent;
+        _repository.update(_event.taskO);
         print('TaskPressed');
         _stateStreamController.add(PressedState<bool>(true));
         break;
 
       case TaskLongPressedEvent:
+        final TaskLongPressedEvent _event = event as TaskLongPressedEvent;
+        _repository.update(_event.taskO);
         print('TaskLongPressed');
         _stateStreamController.add(PressedState<bool>(true));
         break;
@@ -65,39 +73,59 @@ class AddTaskButtonPressedEvent extends Event {
 
   AddTaskButtonPressedEvent({@required this.task});
 
-  AddTaskButtonPressedEvent.fromStrings({String task, String description, int colorHex}) :
-        this(task: Task(1, task, description, colorHex));
+  AddTaskButtonPressedEvent.fromStrings(
+      {String task, String description, int colorHex})
+      : this(task: Task(task, description, colorHex));
 
   String get taskText => task.task;
+
   String get description => task.description;
 }
 
-class HomePageInitializedEvent extends Event {
+class HomePageInitializedEvent extends Event {}
+
+class TaskDeletedEvent extends Event {
+  final Task task;
+
+  TaskDeletedEvent({@required this.task});
+
+  Task get taskE => task;
 }
 
-class HomePageInitializedState<T> extends states.State {
+class TaskEditedEvent extends Event {}
+
+class HomePageInitializedState<T> extends states.State<T> {
   final T data;
 
   HomePageInitializedState(this.data);
 
   @override
-  get stateData => throw UnimplementedError();
+  T get stateData => throw UnimplementedError();
 }
 
-class PressedState<T> extends states.State {
+class PressedState<T> extends states.State<T> {
   final T state;
 
   PressedState(this.state);
 
   @override
-  get stateData => state;
+  T get stateData => state;
 }
 
-class LongPressedState<T> extends states.State {
+class TaskDeletedState<T> extends states.State<T> {
+  final T state;
+
+  TaskDeletedState(this.state);
+
+  @override
+  T get stateData => throw UnimplementedError();
+}
+
+class LongPressedState<T> extends states.State<T> {
   final T state;
 
   LongPressedState(this.state);
 
   @override
-  get stateData => state;
+  T get stateData => state;
 }

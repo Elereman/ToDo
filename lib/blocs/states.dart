@@ -2,7 +2,7 @@ abstract class State<T> with _GetRuntimeType {
   T get stateData;
 }
 
-class TaskWidgetCreatedState<T> extends State {
+class TaskWidgetCreatedState<T> extends State<T> {
   final T _data;
 
   TaskWidgetCreatedState(this._data);
@@ -12,5 +12,5 @@ class TaskWidgetCreatedState<T> extends State {
 }
 
 mixin _GetRuntimeType {
-  Type get type => this.runtimeType;
+  Type get type => runtimeType;
 }

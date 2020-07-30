@@ -4,39 +4,39 @@ import 'package:rxdart/rxdart.dart';
 
 class TaskDialogBloc {
   final BehaviorSubject<Event> _eventStreamController;
-  final BehaviorSubject<states.State> _stateStreamController;
+  final BehaviorSubject<states.State<dynamic>> _stateStreamController;
 
   TaskDialogBloc()
       : _eventStreamController = BehaviorSubject<Event>(),
-        _stateStreamController = BehaviorSubject<states.State>(){
-    _eventStreamController.stream.listen((event) => _handleEvent(event));
+        _stateStreamController = BehaviorSubject<states.State<dynamic>>(){
+    _eventStreamController.stream.listen((Event event) => _handleEvent(event));
   }
 
   void _handleEvent(Event event) {
     switch (event.type) {
       case ColorChangedEvent:
         print('ColorChanged');
-        ColorChangedEvent colorChanged = event as ColorChangedEvent;
-        _stateStreamController.add(ColorChangedState(colorChanged.colorHex));
+        final ColorChangedEvent colorChanged = event as ColorChangedEvent;
+        _stateStreamController.add(ColorChangedState<int>(colorChanged.colorHex));
         break;
     }
   }
 
-  Stream<states.State> get stateStream => _stateStreamController.stream;
+  Stream<states.State<dynamic>> get stateStream => _stateStreamController.stream;
   Sink<Event> get eventSink => _eventStreamController.sink;
 }
 
 class ColorChangedEvent extends Event {
-  final colorHex;
+  final int colorHex;
 
   ColorChangedEvent(this.colorHex);
 }
 
-class ColorChangedState<T> extends states.State {
+class ColorChangedState<T> extends states.State<T> {
   final T data;
 
   ColorChangedState(this.data);
 
   @override
-  get stateData => data;
+  T get stateData => data;
 }

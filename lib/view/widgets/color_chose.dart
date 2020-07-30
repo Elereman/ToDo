@@ -9,24 +9,24 @@ class ColorChoose extends StatelessWidget {
   Color color;
 
   ColorChoose(
-      {Key key,
-      @required this.colors,
+      {@required this.colors,
       @required this.function,
       @required this.label,
       @required this.defaultColor,
-      this.color: Colors.cyan})
+      Key key,
+      this.color = Colors.cyan})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        height: 170,
+        height: 140,
         color: Colors.white,
         child: Column(
-          children: [
+          children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 8),
               child: Container(
                 child: Text(label),
                 alignment: Alignment.center,
@@ -34,32 +34,8 @@ class ColorChoose extends StatelessWidget {
             ),
             Wrap(
               spacing: 5,
-              children: [..._generateFromColors(colors)],
+              children: <MaterialButton>[..._generateFromColors(colors, context)],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  MaterialButton(
-                    onPressed: () {
-                      function(color);
-                      _closeDialog(context);
-                    },
-                    color: Colors.green,
-                    child: Text('Save'),
-                  ),
-                  Spacer(),
-                  MaterialButton(
-                    onPressed: () {
-                      color = defaultColor;
-                      _closeDialog(context);
-                    },
-                    color: Colors.red,
-                    child: Text('Cancel'),
-                  ),
-                ],
-              ),
-            )
           ],
         ),
       ),
@@ -70,12 +46,16 @@ class ColorChoose extends StatelessWidget {
     Navigator.of(context, rootNavigator: true).pop(this);
   }
 
-  List<RaisedButton> _generateFromColors(List<Color> colors) {
-    List<RaisedButton> result = [];
-    colors.forEach((element) {
+  List<MaterialButton> _generateFromColors(List<Color> colors, BuildContext context) {
+    final List<MaterialButton> result = <MaterialButton>[];
+    colors.forEach((Color element) {
       MaterialButton button;
       button = RaisedButton(
-        onPressed: () => color = element,
+        onPressed: () {
+          color = element;
+          function(color);
+          _closeDialog(context);
+          },
         color: element,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       );
