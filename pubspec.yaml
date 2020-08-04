@@ -24,7 +24,6 @@ dependencies:
   shared_preferences: 0.5.8
   localstorage: 3.0.0
   rxdart: 0.24.1
-  flutter_colorpicker: 0.3.4
 
   flutter:
     sdk: flutter

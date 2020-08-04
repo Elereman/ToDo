@@ -1,6 +1,8 @@
 import 'package:ToDo/blocs/home_page_bloc.dart' as bloc;
 import 'package:ToDo/blocs/task_dialog_bloc.dart';
 import 'package:ToDo/models/task.dart';
+import 'package:ToDo/view/widgets/color_chose.dart';
+import 'package:ToDo/view/widgets/settings_widget.dart';
 import 'package:ToDo/view/widgets/task_dialog.dart';
 import 'package:ToDo/view/widgets/task_widget.dart';
 import 'package:ToDo/blocs/events.dart';
@@ -9,7 +11,7 @@ import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
   final bloc.HomePageBloc hbloc;
-  final List<Widget> _widgets = <SimpleTaskWidget>[];
+  final List<TaskWidget> _widgets = <SimpleTaskWidget>[];
   final TaskDialogBloc _taskBloc = TaskDialogBloc();
   Color _chosenColor = Colors.cyan;
 
@@ -27,9 +29,10 @@ class HomePage extends StatelessWidget {
         _widgets.add(
           SimpleTaskWidget(
             bloc: hbloc,
-            color: Color(element.color),
+            mainColor: Color(element.color),
             task: element,
-            onDissmised: _deleteTaskWidget,
+            onDismissed: _deleteTaskWidget,
+            checkboxValue: element.isComplete,
             dialog: TaskDialog(
               onSaveButton: _sendTaskToBloc,
               dialogText: 'Create new task',
@@ -41,7 +44,7 @@ class HomePage extends StatelessWidget {
     });
   }
 
-  void _deleteTaskWidget(Widget widget) {
+  void _deleteTaskWidget(TaskWidget widget) {
     _widgets.remove(widget);
   }
 
@@ -65,24 +68,32 @@ class HomePage extends StatelessWidget {
     ));
   }
 
-  void _addWidgetFromSnapshot(AsyncSnapshot<states.State<dynamic>> snapshot) {
-    print(snapshot.data.runtimeType);
+  void _handleState(AsyncSnapshot<states.State<dynamic>> snapshot) {
     if (snapshot.hasData) {
       if (snapshot.data is states.TaskWidgetCreatedState<Task>) {
         final states.State<Task> _state =
             snapshot.data as states.TaskWidgetCreatedState<Task>;
         final Task _task = _state.stateData;
         _widgets.add(SimpleTaskWidget(
-          onDissmised: _deleteTaskWidget,
-          bloc: hbloc,
-          color: _chosenColor,
-          task: _task,
-          dialog: TaskDialog(
-            onSaveButton: _sendTaskToBloc,
-            dialogText: 'Edit task',
-            bloc: _taskBloc,
-          )
-        ));
+            onDismissed: _deleteTaskWidget,
+            bloc: hbloc,
+            mainColor: _chosenColor,
+            task: _task,
+            dialog: TaskDialog(
+              onSaveButton: _sendTaskToBloc,
+              dialogText: 'Edit task',
+              bloc: _taskBloc,
+            )));
+      } else if (snapshot.data is bloc.TaskDeletedState<Task>) {
+        final List<TaskWidget> _toRemove = <TaskWidget>[];
+        final states.State<Task> _state =
+        snapshot.data as bloc.TaskDeletedState<Task>;
+        _widgets.forEach((TaskWidget element) {
+          if(element.getTask() == _state.stateData) {
+            _toRemove.add(element);
+          }
+        });
+        _widgets.removeWhere((TaskWidget element) => _toRemove.contains(element));
       }
     }
   }
@@ -90,6 +101,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: SettingsDrawer(<Color>[
+        Colors.black,
+      ], _deleteAllTasks),
       appBar: AppBar(
         title: const Text('Task\'s'),
       ),
@@ -97,14 +111,13 @@ class HomePage extends StatelessWidget {
           stream: hbloc.stateStream,
           builder: (BuildContext context,
               AsyncSnapshot<states.State<dynamic>> snapshot) {
-            _addWidgetFromSnapshot(snapshot);
+            _handleState(snapshot);
             return SingleChildScrollView(
               child: Column(
                 children: _widgets,
               ),
             );
           }),
-      backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
@@ -125,5 +138,12 @@ class HomePage extends StatelessWidget {
         elevation: 5,
       ),
     );
+  }
+
+  void _deleteAllTasks() {
+    final List<TaskWidget> _toRemove = _widgets;
+    _widgets.forEach((TaskWidget element) =>
+        _sendEventToBloc(bloc.TaskDeletedEvent(task: element.getTask())));
+    _widgets.removeWhere((TaskWidget element) => _toRemove.contains(element));
   }
 }

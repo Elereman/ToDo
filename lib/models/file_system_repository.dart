@@ -11,9 +11,9 @@ class FileSystemRepository implements TaskRepository {
 
   Future<File> get _localFile async {
     final String path = await _localPath;
-    final File _file = File('$path/$_fileName');
-    if(!(await _file.exists())) {
-      _file.create(recursive: true);
+    final File  _file = File('$path/$_fileName');
+    if(!await _file.exists()) {
+      _file.createSync();
     }
     return _file;
   }
@@ -25,37 +25,43 @@ class FileSystemRepository implements TaskRepository {
 
   Future<File> _writeTaskList(List<Task> tasks) async {
     final File file = await _localFile;
-    return file.writeAsString(_codec.encode(tasks));
+    file.deleteSync();
+    file.createSync();
+    return await file.writeAsString(_codec.encode(tasks));
   }
 
   Future<dynamic> _readTaskList() async {
     try {
       final File file = await _localFile;
       final String contents = await file.readAsString();
-
-      print(contents);
-      return _codec.decode(contents);
+      print('String $contents' + 'end');
+      if (contents.isNotEmpty) {
+        String clearContents = contents.replaceAll('null,', '');
+        return await _codec.decode(clearContents);
+      } else {
+        return <dynamic>[];
+      }
     } on Exception catch (e) {
-      print(e);
-      return null;
+      print('exeption $e');
+      return <dynamic>[];
     }
   }
 
   @override
   Future<bool> create(Task task) async {
-    getAll().then((List<Task> value) {
-      _writeTaskList(<Task>[...value, task]);
-      return true;
-    });
+    final List<Task> value = await getAll();
+    task.id = value.length;
+    print('task id ${task.id}');
+    await _writeTaskList(<Task>[...value, task]);
     return true;
   }
 
   @override
   Future<bool> delete(Task task) async {
-    List<Task> _tasks = await getAll();
-    _tasks.removeAt(task.
-    TaskID);
-    await _writeTaskList(_tasks);
+    final List<Task> _tasks = await getAll();
+    _tasks.removeAt(task.id);
+    await _writeTaskList(_rebuildIDsInList(_tasks));
+    print('deleted');
     return true;
   }
 
@@ -64,14 +70,30 @@ class FileSystemRepository implements TaskRepository {
     final dynamic value = await _readTaskList();
     if (value != null) {
       final List<Task> tasks = <Task>[];
+      print('runtime type ${value.runtimeType}');
       final List<dynamic> _tasks = value as List<dynamic>;
+      print('started conversion');
       _tasks.forEach((dynamic element) {
+        print(element as Map<String, dynamic>);
         tasks.add(_convertFromJsonToTask(element as Map<String, dynamic>));
       });
       return tasks;
     } else {
-      return <Task> [];
+      return <Task>[];
     }
+  }
+
+  List<Task> _rebuildIDsInList(List<Task> tasks) {
+    final List<Task> _result = <Task>[];
+    int id = 0;
+    tasks.forEach((Task element) {
+      if (element.id == id + 1) {
+        element.id = id;
+      }
+      _result.add(element);
+      ++id;
+    });
+    return _result;
   }
 
   Task _convertFromJsonToTask(Map<String, dynamic> task) => Task(
@@ -88,9 +110,11 @@ class FileSystemRepository implements TaskRepository {
   }
 
   @override
-  Future<bool> update(Task task) async {
-    await delete(task);
-    await create(task);
-    return true;
+  Future<Task> update(Task task) async {
+    final List<Task> _tasks = await getAll();
+    _tasks.removeAt(task.id);
+    _tasks.insert(task.id, task);
+    await _writeTaskList(_tasks);
+    return task;
   }
 }

@@ -6,7 +6,7 @@ class Task {
   bool isCompleted;
 
   Task(this._task, this._taskDescription, this._color,
-      {this.isCompleted = false, this.id = 0});
+      {this.isCompleted = false, this.id = -1});
 
   bool get isComplete => isCompleted;
 

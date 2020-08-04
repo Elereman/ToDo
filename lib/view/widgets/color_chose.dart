@@ -20,24 +20,24 @@ class ColorChoose extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: Container(
-        height: 140,
-        color: Colors.white,
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Container(
-                child: Text(label),
-                alignment: Alignment.center,
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Container(
+              child: Text(label),
+              alignment: Alignment.center,
             ),
-            Wrap(
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Wrap(
               spacing: 5,
               children: <MaterialButton>[..._generateFromColors(colors, context)],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

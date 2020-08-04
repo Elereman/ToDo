@@ -12,8 +12,9 @@ class ToDoApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Colors.green,
-        accentColor: Colors.green[300],
+        accentColor: Colors.greenAccent,
       ),
+      darkTheme: ThemeData.dark(),
       title: 'ToDo Application',
       home: HomePage(
         hbloc: HomePageBloc(),

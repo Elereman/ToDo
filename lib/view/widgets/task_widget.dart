@@ -6,24 +6,31 @@ import 'package:ToDo/view/widgets/task_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-abstract class TaskWidget extends StatelessWidget {}
+abstract class TaskWidget extends StatelessWidget {
+  Task getTask();
+
+  void dismiss();
+}
 
 class SimpleTaskWidget extends TaskWidget {
-  Color color;
+  Color mainColor, taskColor, descriptionColor;
   final HomePageBloc bloc;
   final TaskDialog dialog;
   final Task task;
-  final Function(TaskWidget) onDissmised;
+  final Function(TaskWidget) onDismissed;
 
   String taskText, description = '';
-  bool _checkboxValue = false;
+  bool checkboxValue = false;
 
   SimpleTaskWidget(
-      {@required this.color,
+      {@required this.mainColor,
       @required this.bloc,
       @required this.dialog,
       @required this.task,
-      @required this.onDissmised}) {
+      @required this.onDismissed,
+      this.taskColor = Colors.black,
+      this.descriptionColor = Colors.grey,
+      this.checkboxValue = false}) {
     taskText = task.task;
     description = task.description;
   }
@@ -35,73 +42,79 @@ class SimpleTaskWidget extends TaskWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: StreamBuilder<states.State<dynamic>>(
-          stream: bloc.stateStream,
-          builder: (BuildContext context,
-              AsyncSnapshot<states.State<dynamic>> snapshot) {
-            return Dismissible(
-              key: UniqueKey(),
-              onDismissed: (DismissDirection direction) {
-                _sendEventToBloc(TaskDeletedEvent(task: task));
-                onDissmised(this);
+            stream: bloc.stateStream,
+            builder: (BuildContext context,
+                AsyncSnapshot<states.State<dynamic>> snapshot) {
+              return Dismissible(
+                key: UniqueKey(),
+                onDismissed: (DismissDirection direction) {
+                  _sendEventToBloc(TaskDeletedEvent(task: task));
+                  onDismissed(this);
                 },
-              child: Container(
-                color: color,
-                width: double.infinity,
-                child: FlatButton(
-                  onPressed: () {
-                    _sendEventToBloc(TaskPressedEvent());
-                    _checkboxValue = !_checkboxValue;
-                  },
-                  onLongPress: () {
-                    dialog.color = color;
-                    dialog.task = taskText;
-                    dialog.description = description;
-                    showDialog<TaskDialog>(context: context, child: dialog).then((TaskDialog value) {
-                      taskText = value.getTask;
-                      description = value.getDescription;
-                      color = value.color;
-                      _sendEventToBloc(TaskLongPressedEvent(
-                        taskO: Task(taskText, description, color.value,
-                            isCompleted: _checkboxValue,
-                            id: task.TaskID),
+                child: Container(
+                  color: mainColor,
+                  width: double.infinity,
+                  child: FlatButton(
+                    onPressed: () {
+                      _sendEventToBloc(TaskPressedEvent(
+                        taskO: Task(task.task, task.description, task.color,
+                            isCompleted: !task.isComplete, id: task.id),
                       ));
-                    });
-                  },
-                  child: Row(
-                    children: <Widget>[
-                      const Spacer(
-                        flex: 1,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            taskText,
-                          ),
-                          Wrap(
-                            children: <Widget>[
-                              Text(
-                                description,
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const Spacer(
-                        flex: 27,
-                      ),
-                      Checkbox(
-                        value: _checkboxValue,
-                        onChanged: null,
-                      ),
-                    ],
+                      checkboxValue = !checkboxValue;
+                    },
+                    onLongPress: () {
+                      dialog.color = mainColor;
+                      dialog.task = taskText;
+                      dialog.description = description;
+                      showDialog<TaskDialog>(context: context, child: dialog)
+                          .then((TaskDialog value) {
+                        if (value != null) {
+                          taskText = value.getTask;
+                          description = value.getDescription;
+                          mainColor = value.color;
+                          _sendEventToBloc(TaskLongPressedEvent(
+                            taskO: Task(taskText, description, mainColor.value,
+                                isCompleted: checkboxValue, id: task.TaskID),
+                          ));
+                        }
+                      });
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        const Spacer(
+                          flex: 1,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              taskText,
+                              style: TextStyle(color: taskColor),
+                            ),
+                            Wrap(
+                              children: <Widget>[
+                                Text(
+                                  description,
+                                  style: TextStyle(color: descriptionColor),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const Spacer(
+                          flex: 27,
+                        ),
+                        Checkbox(
+                          value: checkboxValue,
+                          onChanged: (bool status) =>
+                              _sendEventToBloc(TaskPressedEvent(taskO: task)),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }
-        ),
+              );
+            }),
       ),
     );
   }
@@ -125,5 +138,14 @@ class SimpleTaskWidget extends TaskWidget {
 
   void _sendEventToBloc(Event event) {
     bloc.eventSink.add(event);
+  }
+
+  @override
+  Task getTask() => task;
+
+  @override
+  void dismiss() {
+    _sendEventToBloc(TaskDeletedEvent(task: task));
+    onDismissed(this);
   }
 }
