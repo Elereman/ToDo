@@ -1,4 +1,4 @@
-import 'package:ToDo/blocs/states.dart' as states;
+import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/home_page_bloc.dart';
 import 'package:ToDo/models/task.dart';
@@ -41,10 +41,10 @@ class SimpleTaskWidget extends TaskWidget {
       padding: const EdgeInsets.all(4.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
-        child: StreamBuilder<states.State<dynamic>>(
+        child: StreamBuilder<BlocState<dynamic>>(
             stream: bloc.stateStream,
             builder: (BuildContext context,
-                AsyncSnapshot<states.State<dynamic>> snapshot) {
+                AsyncSnapshot<BlocState<dynamic>> snapshot) {
               return Dismissible(
                 key: UniqueKey(),
                 onDismissed: (DismissDirection direction) {
@@ -119,10 +119,10 @@ class SimpleTaskWidget extends TaskWidget {
     );
   }
 
-  bool getBoolFromSnapshot(AsyncSnapshot<states.State<dynamic>> snapshot) {
+  bool getBoolFromSnapshot(AsyncSnapshot<BlocState<dynamic>> snapshot) {
     print(snapshot.data.runtimeType);
     if (snapshot.hasData) {
-      final states.State<dynamic> _state = snapshot.data;
+      final BlocState<dynamic> _state = snapshot.data;
       switch (_state.runtimeType) {
         case PressedState:
           print('tps');
@@ -136,7 +136,7 @@ class SimpleTaskWidget extends TaskWidget {
     return false;
   }
 
-  void _sendEventToBloc(Event event) {
+  void _sendEventToBloc(BlocEvent event) {
     bloc.eventSink.add(event);
   }
 

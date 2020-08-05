@@ -1,9 +1,9 @@
 import 'package:ToDo/models/task.dart';
 import 'package:flutter/foundation.dart';
 
-abstract class Event with _GetRuntimeType {}
+abstract class BlocEvent with _GetRuntimeType {}
 
-class TaskPressedEvent extends Event {
+class TaskPressedEvent extends BlocEvent {
   final Task taskO;
 
   TaskPressedEvent({@required this.taskO});
@@ -15,7 +15,7 @@ class TaskPressedEvent extends Event {
   String get description => taskO.description;
 }
 
-class TaskLongPressedEvent extends Event {
+class TaskLongPressedEvent extends BlocEvent {
   final Task taskO;
 
   TaskLongPressedEvent({@required this.taskO});

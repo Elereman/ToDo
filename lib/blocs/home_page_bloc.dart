@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart' as states;
 import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/models/file_system_repository.dart';
-import 'package:ToDo/models/mock_task_repository.dart';
+import 'package:ToDo/models/setting.dart';
+import 'package:ToDo/models/settings_repository.dart';
+import 'package:ToDo/models/shared_preferences_settings_repository.dart';
 import 'package:ToDo/models/task.dart';
 import 'package:ToDo/models/task_repository.dart';
 import 'package:flutter/foundation.dart';
@@ -12,22 +13,25 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomePageBloc {
-  final BehaviorSubject<Event> _eventStreamController;
-  final BehaviorSubject<states.State<dynamic>> _stateStreamController;
+  final BehaviorSubject<BlocEvent> _eventStreamController;
+  final BehaviorSubject<BlocState<dynamic>> _stateStreamController;
   final TaskRepository _repository;
+  final SettingsRepository _settingsRepository;
 
   HomePageBloc()
-      : _eventStreamController = BehaviorSubject<Event>(),
-        _stateStreamController = BehaviorSubject<states.State<dynamic>>(),
-        _repository = FileSystemRepository() {
-    _eventStreamController.stream.listen((Event event) => _handleEvent(event));
+      : _eventStreamController = BehaviorSubject<BlocEvent>(),
+        _stateStreamController = BehaviorSubject<BlocState<dynamic>>(),
+        _repository = FileSystemRepository(),
+        _settingsRepository = SharedPreferencesSettingsRepository() {
+    _settingsRepository.initialize();
+    _eventStreamController.stream.listen((BlocEvent event) => _handleEvent(event));
   }
 
-  Stream<states.State<dynamic>> get stateStream => _stateStreamController.stream;
+  Stream<BlocState<dynamic>> get stateStream => _stateStreamController.stream;
 
-  Sink<Event> get eventSink => _eventStreamController.sink;
+  Sink<BlocEvent> get eventSink => _eventStreamController.sink;
 
-  Future<void> _handleEvent(Event event) async {
+  Future<void> _handleEvent(BlocEvent event) async {
     switch (event.type) {
       case HomePageInitializedEvent:
         print('HomePageInitialized');
@@ -73,11 +77,37 @@ class HomePageBloc {
         print('TaskLongPressed');
         _stateStreamController.add(PressedState<Task>(updated));
         break;
+
+      case SettingsChangedPressedEvent:
+        final SettingsChangedPressedEvent _event = event as SettingsChangedPressedEvent;
+        _settingsRepository.update(_event.setting);
+        print('SettingsChangedPressed');
+        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>
+          (await _settingsRepository.readAll())
+        );
+        break;
+
+      case SettingsResetPressedEvent:
+        //final SettingsResetPressedEvent _event = event as SettingsResetPressedEvent;
+        await _settingsRepository.resetAll();
+        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>
+          (await _settingsRepository.readAll()));
+        break;
+
+      case SettingsBuildEvent:
+      //final SettingsResetPressedEvent _event = event as SettingsResetPressedEvent;
+        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>
+          (await _settingsRepository.readAll()));
+        break;
     }
   }
 }
 
-class AddTaskButtonPressedEvent extends Event {
+class SettingsResetPressedEvent extends BlocEvent {}
+
+class SettingsBuildEvent extends BlocEvent {}
+
+class AddTaskButtonPressedEvent extends BlocEvent {
   final Task task;
 
   AddTaskButtonPressedEvent({@required this.task});
@@ -91,9 +121,18 @@ class AddTaskButtonPressedEvent extends Event {
   String get description => task.description;
 }
 
-class HomePageInitializedEvent extends Event {}
+class SettingsChangedPressedEvent extends BlocEvent {
+  final Setting<String> data;
 
-class TaskDeletedEvent extends Event {
+  SettingsChangedPressedEvent({@required this.data});
+
+
+  Setting<String> get setting => data;
+}
+
+class HomePageInitializedEvent extends BlocEvent {}
+
+class TaskDeletedEvent extends BlocEvent {
   final Task task;
 
   TaskDeletedEvent({@required this.task});
@@ -101,7 +140,7 @@ class TaskDeletedEvent extends Event {
   Task get taskE => task;
 }
 
-class AllTaskDeletedEvent extends Event {
+class AllTaskDeletedEvent extends BlocEvent {
   final List<Task> task;
 
   AllTaskDeletedEvent({@required this.task});
@@ -109,7 +148,7 @@ class AllTaskDeletedEvent extends Event {
   List<Task> get taskE => task;
 }
 
-class TaskEditedEvent extends Event {
+class TaskEditedEvent extends BlocEvent {
   final Task task;
 
   TaskEditedEvent({@required this.task});
@@ -117,7 +156,7 @@ class TaskEditedEvent extends Event {
   Task get taskE => task;
 }
 
-class HomePageInitializedState<T> extends states.State<T> {
+class HomePageInitializedState<T> extends BlocState<T> {
   final T data;
 
   HomePageInitializedState(this.data);
@@ -126,7 +165,16 @@ class HomePageInitializedState<T> extends states.State<T> {
   T get stateData => data;
 }
 
-class AllTaskDeletedState<T> extends states.State<T> {
+class SettingsChangedState<T> extends BlocState<T> {
+  final T data;
+
+  SettingsChangedState(this.data);
+
+  @override
+  T get stateData => data;
+}
+
+class AllTaskDeletedState<T> extends BlocState<T> {
   final T data;
 
   AllTaskDeletedState(this.data);
@@ -135,7 +183,7 @@ class AllTaskDeletedState<T> extends states.State<T> {
   T get stateData => data;
 }
 
-class PressedState<T> extends states.State<T> {
+class PressedState<T> extends BlocState<T> {
   final T state;
 
   PressedState(this.state);
@@ -144,7 +192,7 @@ class PressedState<T> extends states.State<T> {
   T get stateData => state;
 }
 
-class TaskDeletedState<T> extends states.State<T> {
+class TaskDeletedState<T> extends BlocState<T> {
   final T state;
 
   TaskDeletedState(this.state);
@@ -153,7 +201,7 @@ class TaskDeletedState<T> extends states.State<T> {
   T get stateData => state;
 }
 
-class LongPressedState<T> extends states.State<T> {
+class LongPressedState<T> extends BlocState<T> {
   final T state;
 
   LongPressedState(this.state);

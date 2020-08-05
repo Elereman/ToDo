@@ -1,18 +1,18 @@
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart' as states;
+import 'package:ToDo/blocs/states.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TaskDialogBloc {
-  final BehaviorSubject<Event> _eventStreamController;
-  final BehaviorSubject<states.State<dynamic>> _stateStreamController;
+  final BehaviorSubject<BlocEvent> _eventStreamController;
+  final BehaviorSubject<BlocState<dynamic>> _stateStreamController;
 
   TaskDialogBloc()
-      : _eventStreamController = BehaviorSubject<Event>(),
-        _stateStreamController = BehaviorSubject<states.State<dynamic>>(){
-    _eventStreamController.stream.listen((Event event) => _handleEvent(event));
+      : _eventStreamController = BehaviorSubject<BlocEvent>(),
+        _stateStreamController = BehaviorSubject<BlocState<dynamic>>(){
+    _eventStreamController.stream.listen((BlocEvent event) => _handleEvent(event));
   }
 
-  void _handleEvent(Event event) {
+  void _handleEvent(BlocEvent event) {
     switch (event.type) {
       case ColorChangedEvent:
         print('ColorChanged');
@@ -22,17 +22,17 @@ class TaskDialogBloc {
     }
   }
 
-  Stream<states.State<dynamic>> get stateStream => _stateStreamController.stream;
-  Sink<Event> get eventSink => _eventStreamController.sink;
+  Stream<BlocState<dynamic>> get stateStream => _stateStreamController.stream;
+  Sink<BlocEvent> get eventSink => _eventStreamController.sink;
 }
 
-class ColorChangedEvent extends Event {
+class ColorChangedEvent extends BlocEvent {
   final int colorHex;
 
   ColorChangedEvent(this.colorHex);
 }
 
-class ColorChangedState<T> extends states.State<T> {
+class ColorChangedState<T> extends BlocState<T> {
   final T data;
 
   ColorChangedState(this.data);

@@ -1,19 +1,19 @@
 import 'dart:async';
 
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart' as states;
+import 'package:ToDo/blocs/states.dart';
 
 class TaskWidgetPageBloc {
-  final StreamController<Event> _eventStreamController;
-  final StreamController<states.State> _stateStreamController;
+  final StreamController<BlocEvent> _eventStreamController;
+  final StreamController<BlocState> _stateStreamController;
 
   TaskWidgetPageBloc()
-      : _eventStreamController = StreamController<Event>(),
-        _stateStreamController = StreamController<states.State>() {
+      : _eventStreamController = StreamController<BlocEvent>(),
+        _stateStreamController = StreamController<BlocState>() {
     _eventStreamController.stream.listen((event) => _handleEvent(event));
   }
 
-  void _handleEvent(Event event) {
+  void _handleEvent(BlocEvent event) {
     switch (event.type) {
       case TaskPressedEvent:
         print('TaskPressed');
@@ -21,6 +21,6 @@ class TaskWidgetPageBloc {
     }
   }
 
-  Stream<states.State> get stateStream => _stateStreamController.stream;
-  Sink<Event> get eventSink => _eventStreamController.sink;
+  Stream<BlocState> get stateStream => _stateStreamController.stream;
+  Sink<BlocEvent> get eventSink => _eventStreamController.sink;
 }

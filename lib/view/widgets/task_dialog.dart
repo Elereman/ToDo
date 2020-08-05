@@ -1,6 +1,6 @@
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart' as states;
-import 'package:ToDo/blocs/task_dialog_bloc.dart' as tbloc;
+import 'package:ToDo/blocs/states.dart';
+import 'package:ToDo/blocs/task_dialog_bloc.dart';
 import 'package:ToDo/models/task.dart';
 import 'package:ToDo/view/widgets/color_chose.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ class TaskDialog extends StatelessWidget {
     int colorHex,
   ) onSaveButton;
   final String dialogText;
-  final tbloc.TaskDialogBloc bloc;
+  final TaskDialogBloc bloc;
 
   final TextEditingController taskController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -80,7 +80,7 @@ class TaskDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   MaterialButton(
-                    color: Colors.greenAccent,
+                    color: Theme.of(context).accentColor,
                     child: const Text('save'),
                     onPressed: () {
                       onSaveButton(taskController.text,
@@ -89,17 +89,17 @@ class TaskDialog extends StatelessWidget {
                     },
                   ),
                   const Spacer(),
-                  StreamBuilder<states.State<dynamic>>(
+                  StreamBuilder<BlocState<dynamic>>(
                       stream: bloc.stateStream,
                       builder: (BuildContext context,
-                          AsyncSnapshot<states.State<dynamic>> snapshot) {
+                          AsyncSnapshot<BlocState<dynamic>> snapshot) {
                         color = _getColorFromSnapshot(snapshot);
                         return MaterialButton(
                           color: color,
                           child: const Text('color'),
                           onPressed: () {
                             _showColorPicker(context).then((ColorChoose value) {
-                              color = value.chosenColor;
+                              color = value.chosenColor ?? color;
                               _sendColorChangedToBloc(color);
                             });
                           },
@@ -138,19 +138,19 @@ class TaskDialog extends StatelessWidget {
           Colors.red,
           Colors.blueAccent,
           Colors.orange,
-          Colors.deepOrange,
+          Colors.indigo,
         ],
         function: changeColor,
       ),
     );
   }
 
-  Color _getColorFromSnapshot(AsyncSnapshot<states.State<dynamic>> snapshot) {
+  Color _getColorFromSnapshot(AsyncSnapshot<BlocState<dynamic>> snapshot) {
     if (snapshot.hasData) {
       print(snapshot.data);
-      if (snapshot.data is tbloc.ColorChangedState<int>) {
-        final tbloc.ColorChangedState<int> colorChange =
-            snapshot.data as tbloc.ColorChangedState<int>;
+      if (snapshot.data is ColorChangedState<int>) {
+        final ColorChangedState<int> colorChange =
+            snapshot.data as ColorChangedState<int>;
         return Color(colorChange.data);
       }
     }
@@ -161,12 +161,12 @@ class TaskDialog extends StatelessWidget {
     Navigator.of(context, rootNavigator: true).pop(this);
   }
 
-  void _sendEventToBloc(Event event) {
+  void _sendEventToBloc(BlocEvent event) {
     bloc.eventSink.add(event);
   }
 
   void _sendColorChangedToBloc(Color color) {
-    _sendEventToBloc(tbloc.ColorChangedEvent(color.value));
+    _sendEventToBloc(ColorChangedEvent(color.value));
   }
 
   String get getTask => task;

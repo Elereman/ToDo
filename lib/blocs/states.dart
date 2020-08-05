@@ -1,8 +1,8 @@
-abstract class State<T> with _GetRuntimeType {
+abstract class BlocState<T> with _GetRuntimeType {
   T get stateData;
 }
 
-class TaskWidgetCreatedState<T> extends State<T> {
+class TaskWidgetCreatedState<T> extends BlocState<T> {
   final T _data;
 
   TaskWidgetCreatedState(this._data);
