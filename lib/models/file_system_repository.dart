@@ -83,6 +83,14 @@ class FileSystemRepository implements TaskRepository {
     }
   }
 
+  @override
+  Future<bool> deleteAll() async {
+    final File file = await _localFile;
+    file.deleteSync();
+    file.createSync();
+    return true;
+  }
+
   List<Task> _rebuildIDsInList(List<Task> tasks) {
     final List<Task> _result = <Task>[];
     int id = 0;

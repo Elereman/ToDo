@@ -20,7 +20,7 @@ class SimpleTaskWidget extends TaskWidget {
   final Function(TaskWidget) onDismissed;
 
   String taskText, description = '';
-  bool checkboxValue = false;
+  bool isCompleted;
 
   SimpleTaskWidget(
       {@required this.mainColor,
@@ -29,10 +29,10 @@ class SimpleTaskWidget extends TaskWidget {
       @required this.task,
       @required this.onDismissed,
       this.taskColor = Colors.black,
-      this.descriptionColor = Colors.grey,
-      this.checkboxValue = false}) {
+      this.descriptionColor = Colors.grey,}) {
     taskText = task.task;
     description = task.description;
+    isCompleted = task.isComplete;
   }
 
   @override
@@ -60,7 +60,7 @@ class SimpleTaskWidget extends TaskWidget {
                         taskO: Task(task.task, task.description, task.color,
                             isCompleted: !task.isComplete, id: task.id),
                       ));
-                      checkboxValue = !checkboxValue;
+                      isCompleted = !isCompleted;
                     },
                     onLongPress: () {
                       dialog.color = mainColor;
@@ -74,7 +74,7 @@ class SimpleTaskWidget extends TaskWidget {
                           mainColor = value.color;
                           _sendEventToBloc(TaskLongPressedEvent(
                             taskO: Task(taskText, description, mainColor.value,
-                                isCompleted: checkboxValue, id: task.TaskID),
+                                isCompleted: isCompleted, id: task.TaskID),
                           ));
                         }
                       });
@@ -105,9 +105,10 @@ class SimpleTaskWidget extends TaskWidget {
                           flex: 27,
                         ),
                         Checkbox(
-                          value: checkboxValue,
-                          onChanged: (bool status) =>
-                              _sendEventToBloc(TaskPressedEvent(taskO: task)),
+                          value: isCompleted,
+                          onChanged: (bool status) {
+                              _sendEventToBloc(TaskPressedEvent(taskO: task));
+                            isCompleted = !isCompleted;}
                         ),
                       ],
                     ),

@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/models/file_system_repository.dart';
 import 'package:ToDo/models/setting.dart';
 import 'package:ToDo/models/settings_repository.dart';
-import 'package:ToDo/models/shared_preferences_settings_repository.dart';
 import 'package:ToDo/models/task.dart';
 import 'package:ToDo/models/task_repository.dart';
 import 'package:flutter/foundation.dart';
@@ -18,11 +16,9 @@ class HomePageBloc {
   final TaskRepository _repository;
   final SettingsRepository _settingsRepository;
 
-  HomePageBloc()
+  HomePageBloc(this._repository, this._settingsRepository)
       : _eventStreamController = BehaviorSubject<BlocEvent>(),
-        _stateStreamController = BehaviorSubject<BlocState<dynamic>>(),
-        _repository = FileSystemRepository(),
-        _settingsRepository = SharedPreferencesSettingsRepository() {
+        _stateStreamController = BehaviorSubject<BlocState<dynamic>>(){
     _settingsRepository.initialize();
     _eventStreamController.stream.listen((BlocEvent event) => _handleEvent(event));
   }
@@ -57,11 +53,8 @@ class HomePageBloc {
 
       case AllTaskDeletedEvent:
         print('AllTaskDeleted');
-        final AllTaskDeletedEvent _event = event as AllTaskDeletedEvent;
-        _event.taskE.forEach((Task element) async {
-          await _repository.delete(element);
-        });
-        _stateStreamController.add(AllTaskDeletedState<List<Task>>(_event.task));
+        final bool res = await _repository.deleteAll();
+        _stateStreamController.add(AllTaskDeletedState<bool>(res));
         break;
 
       case TaskPressedEvent:
@@ -112,10 +105,6 @@ class AddTaskButtonPressedEvent extends BlocEvent {
 
   AddTaskButtonPressedEvent({@required this.task});
 
-  AddTaskButtonPressedEvent.fromStrings(
-      {String task, String description, int colorHex})
-      : this(task: Task(task, description, colorHex));
-
   String get taskText => task.task;
 
   String get description => task.description;
@@ -141,11 +130,6 @@ class TaskDeletedEvent extends BlocEvent {
 }
 
 class AllTaskDeletedEvent extends BlocEvent {
-  final List<Task> task;
-
-  AllTaskDeletedEvent({@required this.task});
-
-  List<Task> get taskE => task;
 }
 
 class TaskEditedEvent extends BlocEvent {

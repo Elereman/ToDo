@@ -7,41 +7,62 @@ import 'package:flutter/material.dart';
 
 class TaskDialog extends StatelessWidget {
   final Function(
-    String task,
-    String description,
-    int colorHex,
+    Task task,
   ) onSaveButton;
   final String dialogText;
   final TaskDialogBloc bloc;
 
   final TextEditingController taskController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final List<Color> colorPalette;
+  final Color saveButtonColor;
+  final Color cancelButtonColor;
 
   String task, description;
   Color color;
 
   Task taskO;
 
-  TaskDialog(
-      {@required this.onSaveButton,
-      @required this.dialogText,
-      @required this.bloc,
-      Key key,
-      this.color = Colors.cyan,
-      this.task = '',
-      this.description = ''})
-      : super(key: key);
+  TaskDialog({
+    @required this.onSaveButton,
+    @required this.dialogText,
+    @required this.bloc,
+    Key key,
+    this.color = Colors.cyan,
+    this.task = '',
+    this.description = '',
+    this.cancelButtonColor = Colors.redAccent,
+    this.saveButtonColor = Colors.greenAccent,
+    this.colorPalette = const <Color>[
+      Colors.yellow,
+      Colors.green,
+      Colors.red,
+      Colors.blueAccent,
+      Colors.orange,
+      Colors.indigo,
+    ],
+  }) : super(key: key);
 
-  TaskDialog.edit(
-      {@required this.onSaveButton,
-      @required this.dialogText,
-      @required this.bloc,
-      @required this.taskO,
-      Key key,
-      this.color = Colors.cyan,
-      this.task = '',
-      this.description = ''})
-      : super(key: key);
+  TaskDialog.edit({
+    @required this.onSaveButton,
+    @required this.dialogText,
+    @required this.bloc,
+    @required this.taskO,
+    Key key,
+    this.color = Colors.cyan,
+    this.task = '',
+    this.description = '',
+    this.cancelButtonColor = Colors.redAccent,
+    this.saveButtonColor = Colors.greenAccent,
+    this.colorPalette = const <Color>[
+      Colors.yellow,
+      Colors.green,
+      Colors.red,
+      Colors.blueAccent,
+      Colors.orange,
+      Colors.indigo,
+    ],
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +101,13 @@ class TaskDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   MaterialButton(
-                    color: Theme.of(context).accentColor,
+                    color: saveButtonColor,
                     child: const Text('save'),
                     onPressed: () {
-                      onSaveButton(taskController.text,
-                          descriptionController.text, color.value);
+                      onSaveButton(Task(
+                          taskController.text,
+                          descriptionController.text, color.value
+                      ));
                       _closeDialog(context);
                     },
                   ),
@@ -107,7 +130,7 @@ class TaskDialog extends StatelessWidget {
                       }),
                   const Spacer(),
                   MaterialButton(
-                    color: Colors.redAccent,
+                    color: cancelButtonColor,
                     child: const Text('cancel'),
                     onPressed: () => _closeDialog(context),
                   ),
@@ -132,14 +155,7 @@ class TaskDialog extends StatelessWidget {
         defaultColor: color,
         color: color,
         label: 'Chose color',
-        colors: <Color>[
-          Colors.yellow,
-          Colors.green,
-          Colors.red,
-          Colors.blueAccent,
-          Colors.orange,
-          Colors.indigo,
-        ],
+        colors: colorPalette,
         function: changeColor,
       ),
     );
@@ -173,7 +189,7 @@ class TaskDialog extends StatelessWidget {
 
   String get getDescription => description;
 
-  Color get clolors => color;
+  Color get colors => color;
 
   set setTask(String val) => task = val;
 

@@ -49,4 +49,10 @@ class MockTaskRepository implements TaskRepository {
     });
     return result;
   }
+
+  @override
+  Future<bool> deleteAll() {
+    // TODO: implement deleteAll
+    throw UnimplementedError();
+  }
 }

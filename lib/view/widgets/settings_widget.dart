@@ -1,5 +1,5 @@
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/home_page_bloc.dart';
+import 'package:ToDo/blocs/settings_widget_bloc.dart';
 import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/models/setting.dart';
 import 'package:ToDo/view/widgets/color_chose.dart';
@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 class SettingsDrawer extends StatelessWidget {
   final List<Color> _colorPalette;
   final Function _onClearAllButton;
-  final HomePageBloc _bloc;
+  final Function(BuildContext context) _onThemeSwitch;
+  final SettingsWidgetBloc _bloc;
 
-  const SettingsDrawer(this._colorPalette, this._onClearAllButton, this._bloc,
+  const SettingsDrawer(this._colorPalette, this._onClearAllButton,
+      this._onThemeSwitch, this._bloc,
       {Key key})
       : super(key: key);
 
@@ -25,8 +27,11 @@ class SettingsDrawer extends StatelessWidget {
                 AsyncSnapshot<BlocState<dynamic>> snapshot) {
               final List<Setting<String>> _settings =
                   _getSettingListFromSnapshot(snapshot);
-              final Map<String, String> _settingsMap = _listSettingsToMap(_settings);
+              final Map<String, String> _settingsMap =
+                  _listSettingsToMap(_settings);
               print('settings:::::::::::::::::: $_settings');
+              print('dark mode:::::::::::::::::: ${_settingsMap['dark_mode']}');
+              print('dark mode switch position ${toBoolean(_settingsMap['dark_mode'])}');
               return ListView(
                 padding: EdgeInsets.zero,
                 children: <Widget>[
@@ -48,7 +53,8 @@ class SettingsDrawer extends StatelessWidget {
                             value: _settingsMap.containsKey('dark_mode')
                                 ? toBoolean(_settingsMap['dark_mode'])
                                 : false,
-                            onChanged: (bool value) => _changeTheme(value)),
+                            onChanged: (bool value) =>
+                                _changeTheme(value, context)),
                       ],
                     ),
                   ),
@@ -66,7 +72,8 @@ class SettingsDrawer extends StatelessWidget {
                                     colors: _colorPalette,
                                     function: _changeTaskColor,
                                     label: 'Chose task color',
-                                    defaultColor: _settingsMap.containsKey('task_color')
+                                    defaultColor: _settingsMap
+                                            .containsKey('task_color')
                                         ? toColor(_settingsMap['task_color'])
                                         : _colorPalette[0]));
                           },
@@ -91,8 +98,10 @@ class SettingsDrawer extends StatelessWidget {
                                     colors: _colorPalette,
                                     function: _changeDescriptionColor,
                                     label: 'Chose description color',
-                                    defaultColor: _settingsMap.containsKey('description_color')
-                                        ? toColor(_settingsMap['description_color'])
+                                    defaultColor: _settingsMap
+                                            .containsKey('description_color')
+                                        ? toColor(
+                                            _settingsMap['description_color'])
                                         : _colorPalette[1]));
                           },
                           color: _settingsMap.containsKey('description_color')
@@ -139,9 +148,10 @@ class SettingsDrawer extends StatelessWidget {
         data: Setting<String>('description_color', color.value.toString())));
   }
 
-  void _changeTheme(bool value) {
+  void _changeTheme(bool value, BuildContext context) {
     _sendEventToBloc(SettingsChangedPressedEvent(
         data: Setting<String>('dark_mode', value.toString())));
+    _onThemeSwitch(context);
   }
 
   List<Setting<String>> _getSettingListFromSnapshot(

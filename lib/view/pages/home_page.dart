@@ -1,4 +1,5 @@
 import 'package:ToDo/blocs/home_page_bloc.dart';
+import 'package:ToDo/blocs/settings_widget_bloc.dart' show SettingsWidgetBloc;
 import 'package:ToDo/blocs/task_dialog_bloc.dart';
 import 'package:ToDo/models/setting.dart';
 import 'package:ToDo/models/task.dart';
@@ -7,45 +8,46 @@ import 'package:ToDo/view/widgets/task_dialog.dart';
 import 'package:ToDo/view/widgets/task_widget.dart';
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final HomePageBloc hbloc;
+  final HomePageBloc bloc;
   final List<TaskWidget> _widgets = <SimpleTaskWidget>[];
   final TaskDialogBloc _taskBloc = TaskDialogBloc();
-  Color _chosenColor = Colors.indigo;
-  Color _textColor = Colors.black;
-  Color _descriptionColor = Colors.grey;
+  Color _chosenColor = Colors.cyan;
+  Color _defaultTextColor = Colors.black;
+  Color _defaultDescriptionColor = Colors.grey;
 
-  HomePage({@required this.hbloc, Key key}) : super(key: key) {
-    hbloc.eventSink.add(HomePageInitializedEvent());
-    hbloc.stateStream.first.then((BlocState<dynamic> value) {
+  HomePage({@required this.bloc, Key key}) : super(key: key) {
+    bloc.eventSink.add(HomePageInitializedEvent());
+    bloc.stateStream.first.then((BlocState<dynamic> value) {
       print(value.runtimeType);
 
-      final HomePageInitializedState<List<Task>> state =
-          value as HomePageInitializedState<List<Task>>;
+      if(value is HomePageInitializedState<List<Task>>) {
+        final HomePageInitializedState<List<Task>> state = value;
 
-      _sendEventToBloc(SettingsBuildEvent());
-      final List<Task> tasks = state.data;
-      tasks.forEach((Task element) {
-        print(element);
-        _widgets.add(
-          SimpleTaskWidget(
-            bloc: hbloc,
-            mainColor: Color(element.color),
-            task: element,
-            onDismissed: _deleteTaskWidget,
-            checkboxValue: element.isComplete,
-            taskColor: _textColor,
-            descriptionColor: _descriptionColor,
-            dialog: TaskDialog(
-              onSaveButton: _sendTaskToBloc,
-              dialogText: 'Create new task',
-              bloc: TaskDialogBloc(),
+        _sendEventToBloc(SettingsBuildEvent());
+        final List<Task> tasks = state.data;
+        tasks.forEach((Task element) {
+          print(element);
+          _widgets.add(
+            SimpleTaskWidget(
+              bloc: bloc,
+              mainColor: Color(element.color),
+              task: element,
+              onDismissed: _deleteTaskWidget,
+              taskColor: _defaultTextColor,
+              descriptionColor: _defaultDescriptionColor,
+              dialog: TaskDialog(
+                onSaveButton: _sendTaskToBloc,
+                dialogText: 'Create new task',
+                bloc: TaskDialogBloc(),
+              ),
             ),
-          ),
-        );
-      });
+          );
+        });
+      }
     });
   }
 
@@ -54,23 +56,15 @@ class HomePage extends StatelessWidget {
   }
 
   void _sendEventToBloc(BlocEvent event) {
-    hbloc.eventSink.add(event);
+    bloc.eventSink.add(event);
   }
 
-  void _sendTaskToBloc(String task, String description, int colorHex) {
-    _sendEventToBloc(AddTaskButtonPressedEvent.fromStrings(
-      task: task,
-      description: description,
-      colorHex: colorHex,
-    ));
+  void _sendTaskToBloc(Task task) {
+    _sendEventToBloc(AddTaskButtonPressedEvent(task: task));
   }
 
-  void _sendEditedTaskToBloc(String task, String description, int colorHex) {
-    _sendEventToBloc(AddTaskButtonPressedEvent.fromStrings(
-      task: task,
-      description: description,
-      colorHex: colorHex,
-    ));
+  void _sendEditedTaskToBloc(Task task) {
+    _sendEventToBloc(AddTaskButtonPressedEvent(task: task));
   }
 
   void _handleState(AsyncSnapshot<BlocState<dynamic>> snapshot) {
@@ -81,11 +75,11 @@ class HomePage extends StatelessWidget {
         final Task _task = _state.stateData;
         _widgets.add(SimpleTaskWidget(
             onDismissed: _deleteTaskWidget,
-            bloc: hbloc,
-            mainColor: _chosenColor,
+            bloc: bloc,
+            mainColor: Color(_state.stateData.color),
             task: _task,
-            taskColor: _textColor,
-            descriptionColor: _descriptionColor,
+            taskColor: _defaultTextColor,
+            descriptionColor: _defaultDescriptionColor,
             dialog: TaskDialog(
               onSaveButton: _sendTaskToBloc,
               dialogText: 'Edit task',
@@ -105,17 +99,17 @@ class HomePage extends StatelessWidget {
         final SettingsChangedState<List<Setting<String>>> _state =
         snapshot.data as SettingsChangedState<List<Setting<String>>>;
         final Map<String, String> map =  _listSettingsToMap(_state.stateData);
-        _textColor = Color(int.parse(map['task_color']));
-        _descriptionColor = Color(int.parse(map['description_color']));
+        _defaultTextColor = Color(int.parse(map['task_color']));
+        _defaultDescriptionColor = Color(int.parse(map['description_color']));
         final List<TaskWidget> _replacement = <SimpleTaskWidget>[];
         _widgets.forEach((TaskWidget element) {
           _replacement.add(SimpleTaskWidget(
               onDismissed: _deleteTaskWidget,
-              bloc: hbloc,
-              mainColor: _chosenColor,
+              bloc: bloc,
+              mainColor: Color(element.getTask().color),
               task: element.getTask(),
-              taskColor: _textColor,
-              descriptionColor: _descriptionColor,
+              taskColor: _defaultTextColor,
+              descriptionColor: _defaultDescriptionColor,
               dialog: TaskDialog(
                 onSaveButton: _sendTaskToBloc,
                 dialogText: 'Edit task',
@@ -130,20 +124,22 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: SettingsDrawer(<Color>[
+      endDrawer: SettingsDrawer(const <Color>[
         Colors.black,
         Colors.grey,
         Colors.white,
         Colors.brown,
         Colors.white10,
         Colors.black38,
-      ], _deleteAllTasks,
-      hbloc),
+      ],
+      _deleteAllTasks,
+      _changeTheme,
+      SettingsWidgetBloc(bloc)),
       appBar: AppBar(
         title: const Text('Task\'s'),
       ),
       body: StreamBuilder<BlocState<dynamic>>(
-          stream: hbloc.stateStream,
+          stream: bloc.stateStream,
           builder: (BuildContext context,
               AsyncSnapshot<BlocState<dynamic>> snapshot) {
             _handleState(snapshot);
@@ -183,10 +179,16 @@ class HomePage extends StatelessWidget {
     return _result;
   }
 
+  void _changeTheme(BuildContext context) {
+    final Brightness _currentBrightness=DynamicTheme.of(context).brightness;
+    DynamicTheme.of(context).setBrightness(
+        _currentBrightness==Brightness.light
+            ?Brightness.dark:Brightness.light);
+  }
+
   void _deleteAllTasks() {
     final List<TaskWidget> _toRemove = _widgets;
-    _widgets.forEach((TaskWidget element) =>
-        _sendEventToBloc(TaskDeletedEvent(task: element.getTask())));
+    _sendEventToBloc(AllTaskDeletedEvent());
     _widgets.removeWhere((TaskWidget element) => _toRemove.contains(element));
   }
 }
