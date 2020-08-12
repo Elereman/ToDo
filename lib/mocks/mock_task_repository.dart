@@ -16,20 +16,20 @@ class MockTaskRepository implements TaskRepository {
   Future<bool> create(Task task) async {
     const JsonCodec _codec = JsonCodec();
     print(_codec.encode(<Task>[task]));
-    _tasks.putIfAbsent(task.TaskID, () => task);
+    _tasks.putIfAbsent(task.taskID, () => task);
     return true;
   }
 
   @override
   Future<bool> delete(Task task) async {
-    _tasks.remove(task.TaskID);
+    _tasks.remove(task.taskID);
     return true;
   }
 
   @override
   Future<Task> update(Task task) async {
-    _tasks.update(task.TaskID, (Task value) => task);
-    return _tasks[task.TaskID];
+    _tasks.update(task.taskID, (Task value) => task);
+    return _tasks[task.taskID];
   }
 
   @override

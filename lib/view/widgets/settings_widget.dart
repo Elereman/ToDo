@@ -31,7 +31,8 @@ class SettingsDrawer extends StatelessWidget {
                   _listSettingsToMap(_settings);
               print('settings:::::::::::::::::: $_settings');
               print('dark mode:::::::::::::::::: ${_settingsMap['dark_mode']}');
-              print('dark mode switch position ${toBoolean(_settingsMap['dark_mode'])}');
+              print(
+                  'dark mode switch position ${toBoolean(_settingsMap['dark_mode'])}');
               return ListView(
                 padding: EdgeInsets.zero,
                 children: <Widget>[
@@ -50,9 +51,8 @@ class SettingsDrawer extends StatelessWidget {
                         const Text('Dark theme'),
                         const Spacer(),
                         Switch(
-                            value: _settingsMap.containsKey('dark_mode')
-                                ? toBoolean(_settingsMap['dark_mode'])
-                                : false,
+                            value: _settingsMap.containsKey('dark_mode') &&
+                                toBoolean(_settingsMap['dark_mode']),
                             onChanged: (bool value) =>
                                 _changeTheme(value, context)),
                       ],

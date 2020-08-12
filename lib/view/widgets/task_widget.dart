@@ -74,7 +74,7 @@ class SimpleTaskWidget extends TaskWidget {
                           mainColor = value.color;
                           _sendEventToBloc(TaskLongPressedEvent(
                             taskO: Task(taskText, description, mainColor.value,
-                                isCompleted: isCompleted, id: task.TaskID),
+                                isCompleted: isCompleted, id: task.taskID),
                           ));
                         }
                       });

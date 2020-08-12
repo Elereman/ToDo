@@ -63,10 +63,6 @@ class HomePage extends StatelessWidget {
     _sendEventToBloc(AddTaskButtonPressedEvent(task: task));
   }
 
-  void _sendEditedTaskToBloc(Task task) {
-    _sendEventToBloc(AddTaskButtonPressedEvent(task: task));
-  }
-
   void _handleState(AsyncSnapshot<BlocState<dynamic>> snapshot) {
     if (snapshot.hasData) {
       if (snapshot.data is TaskWidgetCreatedState<Task>) {

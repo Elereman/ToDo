@@ -5,12 +5,12 @@ import 'package:ToDo/blocs/states.dart';
 
 class TaskWidgetPageBloc {
   final StreamController<BlocEvent> _eventStreamController;
-  final StreamController<BlocState> _stateStreamController;
+  final StreamController<BlocState<dynamic>> _stateStreamController;
 
   TaskWidgetPageBloc()
       : _eventStreamController = StreamController<BlocEvent>(),
-        _stateStreamController = StreamController<BlocState>() {
-    _eventStreamController.stream.listen((event) => _handleEvent(event));
+        _stateStreamController = StreamController<BlocState<dynamic>>() {
+    _eventStreamController.stream.listen((BlocEvent event) => _handleEvent(event));
   }
 
   void _handleEvent(BlocEvent event) {
@@ -21,6 +21,6 @@ class TaskWidgetPageBloc {
     }
   }
 
-  Stream<BlocState> get stateStream => _stateStreamController.stream;
+  Stream<BlocState<dynamic>> get stateStream => _stateStreamController.stream;
   Sink<BlocEvent> get eventSink => _eventStreamController.sink;
 }
