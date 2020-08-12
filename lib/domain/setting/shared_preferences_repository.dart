@@ -1,5 +1,5 @@
-import 'package:ToDo/models/setting.dart';
-import 'package:ToDo/models/settings_repository.dart';
+import 'package:ToDo/domain/setting/setting.dart';
+import 'package:ToDo/domain/setting/repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesSettingsRepository implements SettingsRepository {

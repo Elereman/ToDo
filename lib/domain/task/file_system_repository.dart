@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ToDo/models/task.dart';
-import 'package:ToDo/models/task_repository.dart';
+import 'package:ToDo/domain/task/repository.dart';
+import 'package:ToDo/domain/task/task.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileSystemRepository implements TaskRepository {

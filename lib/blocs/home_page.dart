@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/models/setting.dart';
-import 'package:ToDo/models/settings_repository.dart';
-import 'package:ToDo/models/task.dart';
-import 'package:ToDo/models/task_repository.dart';
+import 'package:ToDo/domain/setting/setting.dart';
+import 'package:ToDo/domain/setting/repository.dart';
+import 'package:ToDo/domain/task/repository.dart';
+import 'package:ToDo/domain/task/task.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';

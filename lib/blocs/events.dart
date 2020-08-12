@@ -1,4 +1,4 @@
-import 'package:ToDo/models/task.dart';
+import 'package:ToDo/domain/task/task.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class BlocEvent with _GetRuntimeType {}

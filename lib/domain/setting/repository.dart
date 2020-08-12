@@ -1,4 +1,4 @@
-import 'package:ToDo/models/setting.dart';
+import 'package:ToDo/domain/setting/setting.dart';
 
 abstract class SettingsRepository {
   Future<void> initialize();

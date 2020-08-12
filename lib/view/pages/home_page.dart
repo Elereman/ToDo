@@ -1,8 +1,8 @@
-import 'package:ToDo/blocs/home_page_bloc.dart';
-import 'package:ToDo/blocs/settings_widget_bloc.dart' show SettingsWidgetBloc;
-import 'package:ToDo/blocs/task_dialog_bloc.dart';
-import 'package:ToDo/models/setting.dart';
-import 'package:ToDo/models/task.dart';
+import 'package:ToDo/blocs/home_page.dart';
+import 'package:ToDo/blocs/settings_widget.dart' show SettingsWidgetBloc;
+import 'package:ToDo/blocs/task_dialog.dart';
+import 'package:ToDo/domain/setting/setting.dart';
+import 'package:ToDo/domain/task/task.dart';
 import 'package:ToDo/view/widgets/settings_widget.dart';
 import 'package:ToDo/view/widgets/task_dialog.dart';
 import 'package:ToDo/view/widgets/task_widget.dart';
@@ -134,7 +134,7 @@ class HomePage extends StatelessWidget {
       ],
       _deleteAllTasks,
       _changeTheme,
-      SettingsWidgetBloc(bloc)),
+      SettingsWidgetBloc()),
       appBar: AppBar(
         title: const Text('Task\'s'),
       ),

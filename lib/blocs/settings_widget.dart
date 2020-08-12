@@ -1,9 +1,8 @@
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/home_page_bloc.dart';
 import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/models/setting.dart';
-import 'package:ToDo/models/settings_repository.dart';
-import 'package:ToDo/models/shared_preferences_settings_repository.dart';
+import 'package:ToDo/domain/setting/setting.dart';
+import 'package:ToDo/domain/setting/repository.dart';
+import 'package:ToDo/domain/setting/shared_preferences_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -11,9 +10,8 @@ class SettingsWidgetBloc {
   final BehaviorSubject<BlocEvent> _eventStreamController;
   final BehaviorSubject<BlocState<dynamic>> _stateStreamController;
   final SettingsRepository _settingsRepository;
-  final HomePageBloc _bloc;
 
-  SettingsWidgetBloc(this._bloc)
+  SettingsWidgetBloc()
       : _eventStreamController = BehaviorSubject<BlocEvent>(),
         _stateStreamController = BehaviorSubject<BlocState<dynamic>>(),
         _settingsRepository = SharedPreferencesSettingsRepository() {
@@ -47,10 +45,6 @@ class SettingsWidgetBloc {
           (await _settingsRepository.readAll()));
         break;
     }
-  }
-
-  void _sendEventToBloc(BlocEvent event) {
-    _bloc.eventSink.add(event);
   }
 
   Stream<BlocState<dynamic>> get stateStream => _stateStreamController.stream;

@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:ToDo/models/task.dart';
-import 'package:ToDo/models/task_repository.dart';
+import 'package:ToDo/domain/task/repository.dart';
+import 'package:ToDo/domain/task/task.dart';
+
 
 class MockTaskRepository implements TaskRepository {
-  final Map<int, Task> _tasks = {
+  final Map<int, Task> _tasks = <int, Task>{
     0: Task('123', 'csadfsafdasf', 0xff00bcd4),
     1: Task('567', 'zxcvxzcvxczvzx', 0xff00bcd4),
     2: Task('dfgd', 'sadfsadfsadfasdf', 0xff00bcd4),
@@ -51,8 +52,7 @@ class MockTaskRepository implements TaskRepository {
   }
 
   @override
-  Future<bool> deleteAll() {
-    // TODO: implement deleteAll
-    throw UnimplementedError();
+  Future<bool> deleteAll() async {
+    return true;
   }
 }

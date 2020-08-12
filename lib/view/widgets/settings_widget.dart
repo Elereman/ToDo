@@ -1,7 +1,7 @@
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/settings_widget_bloc.dart';
+import 'package:ToDo/blocs/settings_widget.dart';
 import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/models/setting.dart';
+import 'package:ToDo/domain/setting/setting.dart';
 import 'package:ToDo/view/widgets/color_chose.dart';
 import 'package:flutter/material.dart';
 

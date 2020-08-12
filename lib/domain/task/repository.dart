@@ -1,4 +1,4 @@
-import 'package:ToDo/models/task.dart';
+import 'package:ToDo/domain/task/task.dart';
 
 abstract class TaskRepository {
   Future<void> initialize();

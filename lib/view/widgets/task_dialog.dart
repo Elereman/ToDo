@@ -1,7 +1,7 @@
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/blocs/task_dialog_bloc.dart';
-import 'package:ToDo/models/task.dart';
+import 'package:ToDo/blocs/task_dialog.dart';
+import 'package:ToDo/domain/task/task.dart';
 import 'package:ToDo/view/widgets/color_chose.dart';
 import 'package:flutter/material.dart';
 
