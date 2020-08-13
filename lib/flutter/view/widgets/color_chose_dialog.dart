@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ColorChoose extends StatelessWidget {
+class ColorChooseDialog extends StatelessWidget {
   final List<Color> colors;
   final void Function(Color) function;
   final String label;
@@ -8,7 +8,7 @@ class ColorChoose extends StatelessWidget {
 
   Color color;
 
-  ColorChoose(
+  ColorChooseDialog(
       {@required this.colors,
       @required this.function,
       @required this.label,

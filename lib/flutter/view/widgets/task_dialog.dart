@@ -2,7 +2,7 @@ import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/blocs/task_dialog.dart';
 import 'package:ToDo/domain/task/task.dart';
-import 'package:ToDo/view/widgets/color_chose.dart';
+import 'package:ToDo/flutter/view/widgets/color_chose_dialog.dart';
 import 'package:flutter/material.dart';
 
 class TaskDialog extends StatelessWidget {
@@ -121,7 +121,7 @@ class TaskDialog extends StatelessWidget {
                           color: color,
                           child: const Text('color'),
                           onPressed: () {
-                            _showColorPicker(context).then((ColorChoose value) {
+                            _showColorPicker(context).then((ColorChooseDialog value) {
                               color = value.chosenColor ?? color;
                               _sendColorChangedToBloc(color);
                             });
@@ -148,10 +148,10 @@ class TaskDialog extends StatelessWidget {
     this.color = color;
   }
 
-  Future<ColorChoose> _showColorPicker(BuildContext context) async {
-    return showDialog<ColorChoose>(
+  Future<ColorChooseDialog> _showColorPicker(BuildContext context) async {
+    return showDialog<ColorChooseDialog>(
       context: context,
-      child: ColorChoose(
+      child: ColorChooseDialog(
         defaultColor: color,
         color: color,
         label: 'Chose color',

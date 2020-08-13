@@ -2,7 +2,7 @@ import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/home_page.dart';
 import 'package:ToDo/domain/task/task.dart';
-import 'package:ToDo/view/widgets/task_dialog.dart';
+import 'package:ToDo/flutter/view/widgets/task_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 

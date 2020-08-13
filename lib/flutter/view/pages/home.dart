@@ -3,11 +3,11 @@ import 'package:ToDo/blocs/settings_widget.dart' show SettingsWidgetBloc;
 import 'package:ToDo/blocs/task_dialog.dart';
 import 'package:ToDo/domain/setting/setting.dart';
 import 'package:ToDo/domain/task/task.dart';
-import 'package:ToDo/view/widgets/settings_widget.dart';
-import 'package:ToDo/view/widgets/task_dialog.dart';
-import 'package:ToDo/view/widgets/task_widget.dart';
 import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/states.dart';
+import 'package:ToDo/flutter/view/widgets/settings_drawer.dart';
+import 'package:ToDo/flutter/view/widgets/task.dart';
+import 'package:ToDo/flutter/view/widgets/task_dialog.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 

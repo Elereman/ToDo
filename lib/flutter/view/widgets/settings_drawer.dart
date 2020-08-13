@@ -2,7 +2,7 @@ import 'package:ToDo/blocs/events.dart';
 import 'package:ToDo/blocs/settings_widget.dart';
 import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/domain/setting/setting.dart';
-import 'package:ToDo/view/widgets/color_chose.dart';
+import 'package:ToDo/flutter/view/widgets/color_chose_dialog.dart';
 import 'package:flutter/material.dart';
 
 class SettingsDrawer extends StatelessWidget {
@@ -68,7 +68,7 @@ class SettingsDrawer extends StatelessWidget {
                           onPressed: () {
                             _showColorChoseDialog(
                                 context,
-                                ColorChoose(
+                                ColorChooseDialog(
                                     colors: _colorPalette,
                                     function: _changeTaskColor,
                                     label: 'Chose task color',
@@ -94,7 +94,7 @@ class SettingsDrawer extends StatelessWidget {
                           onPressed: () {
                             _showColorChoseDialog(
                                 context,
-                                ColorChoose(
+                                ColorChooseDialog(
                                     colors: _colorPalette,
                                     function: _changeDescriptionColor,
                                     label: 'Chose description color',
@@ -129,9 +129,9 @@ class SettingsDrawer extends StatelessWidget {
     );
   }
 
-  Future<ColorChoose> _showColorChoseDialog(
-      BuildContext context, ColorChoose colorChoose) async {
-    return await showDialog(context: context, child: colorChoose);
+  Future<ColorChooseDialog> _showColorChoseDialog(
+      BuildContext context, ColorChooseDialog colorChooseDialog) async {
+    return await showDialog(context: context, child: colorChooseDialog);
   }
 
   void _sendEventToBloc(BlocEvent event) {

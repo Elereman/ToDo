@@ -1,5 +1,4 @@
 import 'package:ToDo/blocs/home_page.dart';
-import 'package:ToDo/view/pages/home_page.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +7,7 @@ import 'domain/setting/repository.dart';
 import 'domain/setting/shared_preferences_repository.dart';
 import 'domain/task/file_system_repository.dart';
 import 'domain/task/repository.dart';
+import 'flutter/view/pages/home.dart';
 
 void main() {
   runApp(ToDoApp());
