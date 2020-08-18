@@ -6,34 +6,83 @@ import 'package:ToDo/flutter/view/widgets/task_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-abstract class TaskWidget extends StatelessWidget {
-  Task getTask();
+class TaskWidget extends StatefulWidget {
+  final Color _mainColor, _taskColor, _descriptionColor;
+  final HomePageBloc _bloc;
+  final TaskDialog _dialog;
+  final Task _task;
+  final Function(TaskWidget) _onDismissed;
+  final Function _onLongPress, _onPress;
+  final String _taskText, _description;
+  final bool _isCompleted;
 
-  void dismiss();
+  TaskWidget({
+    @required Color mainColor,
+    @required HomePageBloc bloc,
+    @required TaskDialog dialog,
+    @required Task task,
+    @required Function(TaskWidget) onDismissed,
+    @required Function() onPress,
+    @required Function() onLongPress,
+    Color taskColor = Colors.black,
+    Color descriptionColor = Colors.grey,
+  })  : _mainColor = mainColor,
+        _taskColor = taskColor,
+        _descriptionColor = descriptionColor,
+        _bloc = bloc,
+        _task = task,
+        _onDismissed = onDismissed,
+        _onLongPress = onLongPress,
+        _onPress = onPress,
+        _dialog = dialog,
+        _taskText = task.task,
+        _description = task.description,
+        _isCompleted = task.isCompleted;
+
+  @override
+  _TaskWidgetState createState() => _TaskWidgetState(
+      this,
+      _mainColor,
+      _taskColor,
+      _descriptionColor,
+      _bloc,
+      _dialog,
+      _task,
+      _onDismissed,
+      _onLongPress,
+      _onPress,
+      _taskText,
+      _description,
+      _isCompleted);
+
+  Task getTask() => _task;
 }
 
-class SimpleTaskWidget extends TaskWidget {
-  Color mainColor, taskColor, descriptionColor;
-  final HomePageBloc bloc;
-  final TaskDialog dialog;
-  final Task task;
-  final Function(TaskWidget) onDismissed;
+class _TaskWidgetState extends State<TaskWidget> {
+  final TaskWidget _this;
+  final HomePageBloc _bloc;
+  final TaskDialog _dialog;
+  final Task _task;
+  final Function(TaskWidget) _onDismissed;
+  final Function _onLongPress, _onPress;
+  Color _mainColor, _taskColor, _descriptionColor;
+  String _taskText, _description;
+  bool _isCompleted;
 
-  String taskText, description = '';
-  bool isCompleted;
-
-  SimpleTaskWidget(
-      {@required this.mainColor,
-      @required this.bloc,
-      @required this.dialog,
-      @required this.task,
-      @required this.onDismissed,
-      this.taskColor = Colors.black,
-      this.descriptionColor = Colors.grey,}) {
-    taskText = task.task;
-    description = task.description;
-    isCompleted = task.isComplete;
-  }
+  _TaskWidgetState(
+      this._this,
+      this._mainColor,
+      this._taskColor,
+      this._descriptionColor,
+      this._bloc,
+      this._dialog,
+      this._task,
+      this._onDismissed,
+      this._onLongPress,
+      this._onPress,
+      this._taskText,
+      this._description,
+      this._isCompleted);
 
   @override
   Widget build(BuildContext context) {
@@ -42,75 +91,96 @@ class SimpleTaskWidget extends TaskWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: StreamBuilder<BlocState<dynamic>>(
-            stream: bloc.stateStream,
+            stream: _bloc.stateStream,
             builder: (BuildContext context,
                 AsyncSnapshot<BlocState<dynamic>> snapshot) {
               return Dismissible(
                 key: UniqueKey(),
                 onDismissed: (DismissDirection direction) {
-                  _sendEventToBloc(TaskDeletedEvent(task: task));
-                  onDismissed(this);
+                  _sendEventToBloc(TaskDeletedEvent(task: _task));
+                  _onDismissed(_this);
                 },
-                child: Container(
-                  color: mainColor,
-                  width: double.infinity,
-                  child: FlatButton(
-                    onPressed: () {
-                      _sendEventToBloc(TaskPressedEvent(
-                        taskO: Task(task.task, task.description, task.color,
-                            isCompleted: !task.isComplete, id: task.id),
-                      ));
-                      isCompleted = !isCompleted;
-                    },
-                    onLongPress: () {
-                      dialog.color = mainColor;
-                      dialog.task = taskText;
-                      dialog.description = description;
-                      showDialog<TaskDialog>(context: context, child: dialog)
-                          .then((TaskDialog value) {
-                        if (value != null) {
-                          taskText = value.getTask;
-                          description = value.getDescription;
-                          mainColor = value.color;
-                          _sendEventToBloc(TaskLongPressedEvent(
-                            taskO: Task(taskText, description, mainColor.value,
-                                isCompleted: isCompleted, id: task.taskID),
-                          ));
-                        }
-                      });
-                    },
-                    child: Row(
-                      children: <Widget>[
-                        const Spacer(
-                          flex: 1,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              taskText,
-                              style: TextStyle(color: taskColor),
-                            ),
-                            Wrap(
-                              children: <Widget>[
-                                Text(
-                                  description,
-                                  style: TextStyle(color: descriptionColor),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const Spacer(
-                          flex: 27,
-                        ),
-                        Checkbox(
-                          value: isCompleted,
-                          onChanged: (bool status) {
-                              _sendEventToBloc(TaskPressedEvent(taskO: task));
-                            isCompleted = !isCompleted;}
-                        ),
-                      ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Container(
+                    color: _mainColor,
+                    width: double.infinity,
+                    child: FlatButton(
+                      onPressed: () {
+                        setState(() {
+                          _isCompleted = !_isCompleted;
+                        });
+                        _sendEventToBloc(TaskPressedEvent(
+                          task: Task(
+                              task: _task.task,
+                              taskDescription: _task.description,
+                              color: _task.color,
+                              isCompleted: !_task.isCompleted,
+                              id: _task.id
+                          ),
+                        ));
+                        _onPress();
+                      },
+                      onLongPress: () {
+                        _dialog.color = _mainColor;
+                        _dialog.setTask = _taskText;
+                        _dialog.setDescription = _description;
+                        showDialog<TaskDialog>(context: context, child: _dialog)
+                            .then((TaskDialog value) {
+                          if (value != null) {
+                            setState(() {
+                              _taskText = value.getTask;
+                              _description = value.getDescription;
+                              _mainColor = value.color;
+                            });
+                            _sendEventToBloc(TaskLongPressedEvent(
+                              task: Task(
+                                  task: _taskText,
+                                  taskDescription: _description,
+                                  color: value.color.value,
+                                  isCompleted: _isCompleted,
+                                  id: _task.id),
+                            ));
+                          }
+                        });
+                        _onLongPress();
+                      },
+                      child: Row(
+                        children: <Widget>[
+                          const Spacer(
+                            flex: 1,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                _taskText,
+                                style: TextStyle(color: _taskColor),
+                              ),
+                              Wrap(
+                                children: <Widget>[
+                                  Text(
+                                    _description,
+                                    style: TextStyle(color: _descriptionColor),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const Spacer(
+                            flex: 27,
+                          ),
+                          Checkbox(
+                              value: _isCompleted,
+                              onChanged: (bool status) {
+                                _sendEventToBloc(TaskPressedEvent(task: _task));
+                                setState(() {
+                                  _isCompleted = !_isCompleted;
+                                });
+                                _onPress();
+                              }),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -138,15 +208,6 @@ class SimpleTaskWidget extends TaskWidget {
   }
 
   void _sendEventToBloc(BlocEvent event) {
-    bloc.eventSink.add(event);
-  }
-
-  @override
-  Task getTask() => task;
-
-  @override
-  void dismiss() {
-    _sendEventToBloc(TaskDeletedEvent(task: task));
-    onDismissed(this);
+    _bloc.eventSink.add(event);
   }
 }

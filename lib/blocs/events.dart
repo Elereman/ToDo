@@ -1,30 +1,59 @@
+import 'package:ToDo/domain/setting/setting.dart';
 import 'package:ToDo/domain/task/task.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class BlocEvent with _GetRuntimeType {}
 
-class TaskPressedEvent extends BlocEvent {
-  final Task taskO;
+abstract class BlockEventWithTask extends BlocEvent {
+  final Task _task;
 
-  TaskPressedEvent({@required this.taskO});
+  BlockEventWithTask({@required Task task}) : _task = task;
 
-  TaskPressedEvent.fromStrings({String task, String description, int colorHex}) :
-        this(taskO: Task(task, description, colorHex));
+  Task get task => _task;
 
-  String get task => taskO.task;
-  String get description => taskO.description;
+  String get taskText => _task.task;
+
+  String get descriptionText => _task.description;
 }
 
-class TaskLongPressedEvent extends BlocEvent {
-  final Task taskO;
+class TaskPressedEvent extends BlockEventWithTask {
+  TaskPressedEvent({@required Task task}) : super(task: task);
+}
 
-  TaskLongPressedEvent({@required this.taskO});
+class TaskLongPressedEvent extends BlockEventWithTask {
+  TaskLongPressedEvent({@required Task task}) : super(task: task);
+}
 
-  TaskLongPressedEvent.fromStrings({String task, String description, int colorHex}) :
-        this(taskO: Task(task, description, colorHex));
+class AddTaskButtonPressedEvent extends BlockEventWithTask {
+  AddTaskButtonPressedEvent({@required Task task}) : super(task: task);
+}
 
-  String get task => taskO.task;
-  String get description => taskO.description;
+class TaskDeletedEvent extends BlockEventWithTask {
+  TaskDeletedEvent({@required Task task}) : super(task: task);
+}
+
+class TaskEditedEvent extends BlockEventWithTask {}
+
+class SettingsResetPressedEvent extends BlocEvent {}
+
+class SettingsBuildEvent extends BlocEvent {}
+
+class SettingsChangedPressedEvent extends BlocEvent {
+  final Setting<String> data;
+
+  SettingsChangedPressedEvent({@required this.data});
+
+  Setting<String> get setting => data;
+}
+
+class HomePageInitializedEvent extends BlocEvent {}
+
+class AllTaskDeletedEvent extends BlocEvent {}
+
+class ColorChangedEvent extends BlocEvent {
+  final int colorHex;
+
+  ColorChangedEvent(this.colorHex);
 }
 
 mixin _GetRuntimeType {

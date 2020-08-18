@@ -1,5 +1,5 @@
 import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/settings_widget.dart';
+import 'package:ToDo/blocs/settings_drawer.dart';
 import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/domain/setting/setting.dart';
 import 'package:ToDo/flutter/view/widgets/color_chose_dialog.dart';
@@ -9,7 +9,7 @@ class SettingsDrawer extends StatelessWidget {
   final List<Color> _colorPalette;
   final Function _onClearAllButton;
   final Function(BuildContext context) _onThemeSwitch;
-  final SettingsWidgetBloc _bloc;
+  final SettingsDrawerBloc _bloc;
 
   const SettingsDrawer(this._colorPalette, this._onClearAllButton,
       this._onThemeSwitch, this._bloc,
@@ -53,7 +53,7 @@ class SettingsDrawer extends StatelessWidget {
                         Switch(
                             value: _settingsMap.containsKey('dark_mode') &&
                                 toBoolean(_settingsMap['dark_mode']),
-                            onChanged: (bool value) =>
+                            onChanged: _isDarkModeEnable(context) ? null : (bool value) =>
                                 _changeTheme(value, context)),
                       ],
                     ),
@@ -70,7 +70,7 @@ class SettingsDrawer extends StatelessWidget {
                                 context,
                                 ColorChooseDialog(
                                     colors: _colorPalette,
-                                    function: _changeTaskColor,
+                                    onColorChosen: _changeTaskColor,
                                     label: 'Chose task color',
                                     defaultColor: _settingsMap
                                             .containsKey('task_color')
@@ -96,7 +96,7 @@ class SettingsDrawer extends StatelessWidget {
                                 context,
                                 ColorChooseDialog(
                                     colors: _colorPalette,
-                                    function: _changeDescriptionColor,
+                                    onColorChosen: _changeDescriptionColor,
                                     label: 'Chose description color',
                                     defaultColor: _settingsMap
                                             .containsKey('description_color')
@@ -127,6 +127,14 @@ class SettingsDrawer extends StatelessWidget {
             }),
       ),
     );
+  }
+
+  bool _isDarkModeEnable(BuildContext context) {
+    if(MediaQuery.of(context).platformBrightness == Brightness.dark) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<ColorChooseDialog> _showColorChoseDialog(

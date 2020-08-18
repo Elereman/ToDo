@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ToDo/domain/task/repository.dart';
 import 'package:ToDo/domain/task/task.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'repository.dart';
 
 class FileSystemRepository implements TaskRepository {
   final String _fileName = 'todos.fs';
@@ -11,8 +12,8 @@ class FileSystemRepository implements TaskRepository {
 
   Future<File> get _localFile async {
     final String path = await _localPath;
-    final File  _file = File('$path/$_fileName');
-    if(!await _file.exists()) {
+    final File _file = File('$path/$_fileName');
+    if (!await _file.exists()) {
       _file.createSync();
     }
     return _file;
@@ -50,9 +51,13 @@ class FileSystemRepository implements TaskRepository {
   @override
   Future<bool> create(Task task) async {
     final List<Task> value = await getAll();
-    task.id = value.length;
-    print('task id ${task.id}');
-    await _writeTaskList(<Task>[...value, task]);
+    await _writeTaskList(<Task>[...value, Task(
+    task: task.task,
+    taskDescription: task.description,
+    color: task.color,
+    isCompleted: task.isCompleted,
+    id: value.length,
+    )]);
     return true;
   }
 
@@ -95,21 +100,31 @@ class FileSystemRepository implements TaskRepository {
     final List<Task> _result = <Task>[];
     int id = 0;
     tasks.forEach((Task element) {
+      Task newElement;
       if (element.id == id + 1) {
-        element.id = id;
+        newElement = Task(
+          id: id,
+          task: element.task,
+          taskDescription: element.description,
+          color: element.color,
+          isCompleted: element.isCompleted,
+        );
+        _result.add(newElement);
+      } else {
+        _result.add(element);
       }
-      _result.add(element);
       ++id;
     });
     return _result;
   }
 
-  Task _convertFromJsonToTask(Map<String, dynamic> task) => Task(
-      task['task'] as String,
-      task['description'] as String,
-      task['color'] as int,
-      isCompleted: task['completed'] as bool,
-      id: task['id'] as int);
+  Task _convertFromJsonToTask(Map<String, dynamic> task) =>
+      Task(
+          task: task['task'] as String,
+          taskDescription: task['description'] as String,
+          color: task['color'] as int,
+          isCompleted: task['completed'] as bool,
+          id: task['id'] as int);
 
   @override
   Future<void> initialize() async {

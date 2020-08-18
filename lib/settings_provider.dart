@@ -1,22 +1,22 @@
-import 'package:ToDo/blocs/events.dart';
+import 'dart:async';
+
 import 'package:ToDo/blocs/states.dart';
 import 'package:ToDo/domain/setting/setting.dart';
-import 'package:ToDo/domain/setting/repository.dart';
-import 'package:ToDo/domain/setting/shared_preferences_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
-class SettingsWidgetBloc {
+import 'blocs/events.dart';
+import 'domain/setting/repository/repository.dart';
+
+class SettingsProvider {
   final BehaviorSubject<BlocEvent> _eventStreamController;
   final BehaviorSubject<BlocState<dynamic>> _stateStreamController;
+
   final SettingsRepository _settingsRepository;
 
-  SettingsWidgetBloc()
+  SettingsProvider(this._settingsRepository)
       : _eventStreamController = BehaviorSubject<BlocEvent>(),
-        _stateStreamController = BehaviorSubject<BlocState<dynamic>>(),
-        _settingsRepository = SharedPreferencesSettingsRepository() {
-    _settingsRepository.initialize();
-    _eventStreamController.stream.listen((BlocEvent event) => _handleEvent(event));
+        _stateStreamController = BehaviorSubject<BlocState<dynamic>>() {
+    _eventStreamController.listen((BlocEvent value) async => await _handleEvent(value));
   }
 
   Future<void> _handleEvent(BlocEvent event) async {
@@ -27,8 +27,7 @@ class SettingsWidgetBloc {
         print('SettingsChangedPressed');
         final SettingsChangedState<List<Setting<String>>> _state =
         SettingsChangedState<List<Setting<String>>>
-          (await _settingsRepository.readAll())
-        ;
+          (await _settingsRepository.readAll());
         _stateStreamController.add(_state);
         break;
 
@@ -47,29 +46,7 @@ class SettingsWidgetBloc {
     }
   }
 
+  StreamSink<BlocEvent> get eventSink => _eventStreamController.sink;
+
   Stream<BlocState<dynamic>> get stateStream => _stateStreamController.stream;
-
-  Sink<BlocEvent> get eventSink => _eventStreamController.sink;
-}
-
-class SettingsResetPressedEvent extends BlocEvent {}
-
-class SettingsBuildEvent extends BlocEvent {}
-
-class SettingsChangedPressedEvent extends BlocEvent {
-  final Setting<String> data;
-
-  SettingsChangedPressedEvent({@required this.data});
-
-
-  Setting<String> get setting => data;
-}
-
-class SettingsChangedState<T> extends BlocState<T> {
-  final T data;
-
-  SettingsChangedState(this.data);
-
-  @override
-  T get stateData => data;
 }

@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 
 class ColorChooseDialog extends StatelessWidget {
   final List<Color> colors;
-  final void Function(Color) function;
+  final void Function(Color) onColorChosen;
   final String label;
   final Color defaultColor;
+  final Color color;
 
-  Color color;
-
-  ColorChooseDialog(
+  const ColorChooseDialog(
       {@required this.colors,
-      @required this.function,
+      @required this.onColorChosen,
       @required this.label,
       @required this.defaultColor,
       Key key,
@@ -52,8 +51,8 @@ class ColorChooseDialog extends StatelessWidget {
       MaterialButton button;
       button = RaisedButton(
         onPressed: () {
-          color = element;
-          function(color);
+          //color = element;
+          onColorChosen(element);
           _closeDialog(context);
           },
         color: element,
@@ -64,5 +63,5 @@ class ColorChooseDialog extends StatelessWidget {
     return result;
   }
 
-  Color get chosenColor => color;
+  //Color get chosenColor => color;
 }

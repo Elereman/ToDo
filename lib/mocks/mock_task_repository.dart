@@ -1,35 +1,59 @@
 import 'dart:convert';
 
-import 'package:ToDo/domain/task/repository.dart';
+import 'file:///D:/ToDo/lib/domain/task/repository/repository.dart';
 import 'package:ToDo/domain/task/task.dart';
 
 
 class MockTaskRepository implements TaskRepository {
   final Map<int, Task> _tasks = <int, Task>{
-    0: Task('123', 'csadfsafdasf', 0xff00bcd4),
-    1: Task('567', 'zxcvxzcvxczvzx', 0xff00bcd4),
-    2: Task('dfgd', 'sadfsadfsadfasdf', 0xff00bcd4),
-    3: Task('xcxzczx', 'xopiopuipuiopui', 0xff00bcd4),
+    0: Task(
+      task: '123',
+      taskDescription: 'csadfsafdasf',
+      color: 0xff00bcd4,
+      id: 0,
+      isCompleted: false,
+    ),
+    1: Task(
+      task: '567',
+      taskDescription: 'zxcvxzcvxczvzx',
+      color: 0xff00bcd4,
+      id: 1,
+      isCompleted: false,
+    ),
+    2: Task(
+      task: 'dfgd',
+      taskDescription: 'sadfsadfsadfasdf',
+      color: 0xff00bcd4,
+      id: 2,
+      isCompleted: true,
+    ),
+    3: Task(
+      task: 'xcxzczx',
+      taskDescription: 'xopiopuipuiopui',
+      color: 0xff00bcd4,
+      id: 3,
+      isCompleted: true,
+    ),
   };
 
   @override
   Future<bool> create(Task task) async {
     const JsonCodec _codec = JsonCodec();
     print(_codec.encode(<Task>[task]));
-    _tasks.putIfAbsent(task.taskID, () => task);
+    _tasks.putIfAbsent(task.id, () => task);
     return true;
   }
 
   @override
   Future<bool> delete(Task task) async {
-    _tasks.remove(task.taskID);
+    _tasks.remove(task.id);
     return true;
   }
 
   @override
   Future<Task> update(Task task) async {
-    _tasks.update(task.taskID, (Task value) => task);
-    return _tasks[task.taskID];
+    _tasks.update(task.id, (Task value) => task);
+    return _tasks[task.id];
   }
 
   @override

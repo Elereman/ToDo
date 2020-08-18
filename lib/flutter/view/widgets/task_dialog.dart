@@ -18,6 +18,8 @@ class TaskDialog extends StatelessWidget {
   final Color saveButtonColor;
   final Color cancelButtonColor;
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   String task, description;
   Color color;
 
@@ -43,101 +45,100 @@ class TaskDialog extends StatelessWidget {
     ],
   }) : super(key: key);
 
-  TaskDialog.edit({
-    @required this.onSaveButton,
-    @required this.dialogText,
-    @required this.bloc,
-    @required this.taskO,
-    Key key,
-    this.color = Colors.cyan,
-    this.task = '',
-    this.description = '',
-    this.cancelButtonColor = Colors.redAccent,
-    this.saveButtonColor = Colors.greenAccent,
-    this.colorPalette = const <Color>[
-      Colors.yellow,
-      Colors.green,
-      Colors.red,
-      Colors.blueAccent,
-      Colors.orange,
-      Colors.indigo,
-    ],
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     taskController.text = task;
     descriptionController.text = description;
     return Dialog(
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsetsDirectional.only(top: 8.0),
-              child: Text(dialogText),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextField(
-                controller: taskController,
-                onChanged: (String value) => task = value,
-                decoration: const InputDecoration(
-                    border: InputBorder.none, hintText: 'Enter a task'),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsetsDirectional.only(top: 8.0),
+                child: Text(dialogText),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextField(
-                controller: descriptionController,
-                onChanged: (String value) => description = value,
-                decoration: const InputDecoration(
-                    border: InputBorder.none, hintText: 'Enter a description'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: TextFormField(
+                  controller: taskController,
+                  onChanged: (String value) => task = value,
+                  validator: (String value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some task';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: 'Enter a task'),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  MaterialButton(
-                    color: saveButtonColor,
-                    child: const Text('save'),
-                    onPressed: () {
-                      onSaveButton(Task(
-                          taskController.text,
-                          descriptionController.text, color.value
-                      ));
-                      _closeDialog(context);
-                    },
-                  ),
-                  const Spacer(),
-                  StreamBuilder<BlocState<dynamic>>(
-                      stream: bloc.stateStream,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<BlocState<dynamic>> snapshot) {
-                        color = _getColorFromSnapshot(snapshot);
-                        return MaterialButton(
-                          color: color,
-                          child: const Text('color'),
-                          onPressed: () {
-                            _showColorPicker(context).then((ColorChooseDialog value) {
-                              color = value.chosenColor ?? color;
-                              _sendColorChangedToBloc(color);
-                            });
-                          },
-                        );
-                      }),
-                  const Spacer(),
-                  MaterialButton(
-                    color: cancelButtonColor,
-                    child: const Text('cancel'),
-                    onPressed: () => _closeDialog(context),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: TextFormField(
+                  controller: descriptionController,
+                  onChanged: (String value) => description = value,
+                  validator: (String value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some description';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Enter a description'),
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    MaterialButton(
+                      color: saveButtonColor,
+                      child: const Text('save'),
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          onSaveButton(Task(
+                            task: taskController.text,
+                            taskDescription: descriptionController.text,
+                            color: color.value,
+                          ));
+                          _closeDialog(context);
+                        }
+                      },
+                    ),
+                    const Spacer(),
+                    StreamBuilder<BlocState<dynamic>>(
+                        stream: bloc.stateStream,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<BlocState<dynamic>> snapshot) {
+                          color = _getColorFromSnapshot(snapshot);
+                          return MaterialButton(
+                            color: color,
+                            child: const Text('color'),
+                            onPressed: () {
+                              _showColorPicker(context)
+                                  .then((ColorChooseDialog value) {
+                                color = color;
+                                _sendColorChangedToBloc(color);
+                              });
+                            },
+                          );
+                        }),
+                    const Spacer(),
+                    MaterialButton(
+                      color: cancelButtonColor,
+                      child: const Text('cancel'),
+                      onPressed: () => _closeDialog(context),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -156,7 +157,7 @@ class TaskDialog extends StatelessWidget {
         color: color,
         label: 'Chose color',
         colors: colorPalette,
-        function: changeColor,
+        onColorChosen: changeColor,
       ),
     );
   }
@@ -167,7 +168,7 @@ class TaskDialog extends StatelessWidget {
       if (snapshot.data is ColorChangedState<int>) {
         final ColorChangedState<int> colorChange =
             snapshot.data as ColorChangedState<int>;
-        return Color(colorChange.data);
+        return Color(colorChange.stateData);
       }
     }
     return color;

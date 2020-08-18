@@ -25,18 +25,3 @@ class TaskDialogBloc {
   Stream<BlocState<dynamic>> get stateStream => _stateStreamController.stream;
   Sink<BlocEvent> get eventSink => _eventStreamController.sink;
 }
-
-class ColorChangedEvent extends BlocEvent {
-  final int colorHex;
-
-  ColorChangedEvent(this.colorHex);
-}
-
-class ColorChangedState<T> extends BlocState<T> {
-  final T data;
-
-  ColorChangedState(this.data);
-
-  @override
-  T get stateData => data;
-}
