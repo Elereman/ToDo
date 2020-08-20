@@ -37,8 +37,8 @@ class FileSystemRepository implements TaskRepository {
       final String contents = await file.readAsString();
       print('String $contents end');
       if (contents.isNotEmpty) {
-        final String clearContents = contents.replaceAll('null,', '');
-        return await _codec.decode(clearContents);
+        //final String clearContents = contents.replaceAll('null,', '');
+        return await _codec.decode(contents);
       } else {
         return <dynamic>[];
       }

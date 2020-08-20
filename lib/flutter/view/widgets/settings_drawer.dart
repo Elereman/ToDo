@@ -114,8 +114,10 @@ class SettingsDrawer extends StatelessWidget {
                   MaterialButton(
                     color: Theme.of(context).bottomAppBarColor,
                     child: const Text('Restore defaults'),
-                    onPressed: () =>
-                        _sendEventToBloc(SettingsResetPressedEvent()),
+                    onPressed: () {
+                      _sendEventToBloc(SettingsResetPressedEvent());
+                      _onThemeSwitch(context);
+                    },
                   ),
                   MaterialButton(
                     color: Theme.of(context).bottomAppBarColor,

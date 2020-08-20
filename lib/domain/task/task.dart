@@ -9,7 +9,7 @@ class Task {
       String task = '',
       int color = 0,
       bool isCompleted = false,
-      int id = -1})
+      int id = 0})
       : _id = id,
         _isCompleted = isCompleted,
         _color = color,

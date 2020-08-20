@@ -16,32 +16,35 @@ class SettingsProvider {
   SettingsProvider(this._settingsRepository)
       : _eventStreamController = BehaviorSubject<BlocEvent>(),
         _stateStreamController = BehaviorSubject<BlocState<dynamic>>() {
-    _eventStreamController.listen((BlocEvent value) async => await _handleEvent(value));
+    _settingsRepository.initialize();
+    _eventStreamController
+        .listen((BlocEvent value) async => await _handleEvent(value));
   }
 
   Future<void> _handleEvent(BlocEvent event) async {
     switch (event.type) {
       case SettingsChangedPressedEvent:
-        final SettingsChangedPressedEvent _event = event as SettingsChangedPressedEvent;
+        final SettingsChangedPressedEvent _event =
+            event as SettingsChangedPressedEvent;
         _settingsRepository.update(_event.setting);
         print('SettingsChangedPressed');
         final SettingsChangedState<List<Setting<String>>> _state =
-        SettingsChangedState<List<Setting<String>>>
-          (await _settingsRepository.readAll());
+            SettingsChangedState<List<Setting<String>>>(
+                await _settingsRepository.readAll());
         _stateStreamController.add(_state);
         break;
 
       case SettingsResetPressedEvent:
-      //final SettingsResetPressedEvent _event = event as SettingsResetPressedEvent;
+        //final SettingsResetPressedEvent _event = event as SettingsResetPressedEvent;
         await _settingsRepository.resetAll();
-        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>
-          (await _settingsRepository.readAll()));
+        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>(
+            await _settingsRepository.readAll()));
         break;
 
       case SettingsBuildEvent:
-      //final SettingsResetPressedEvent _event = event as SettingsResetPressedEvent;
-        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>
-          (await _settingsRepository.readAll()));
+        //final SettingsResetPressedEvent _event = event as SettingsResetPressedEvent;
+        _stateStreamController.add(SettingsChangedState<List<Setting<String>>>(
+            await _settingsRepository.readAll()));
         break;
     }
   }
