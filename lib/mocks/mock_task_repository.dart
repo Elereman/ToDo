@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-import 'file:///D:/ToDo/lib/domain/task/repository/repository.dart';
-import 'package:ToDo/domain/task/task.dart';
-
+import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/domain/repositories/task_repository.dart';
 
 class MockTaskRepository implements TaskRepository {
   final Map<int, Task> _tasks = <int, Task>{

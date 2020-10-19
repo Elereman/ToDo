@@ -1,41 +1,38 @@
-import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/blocs/task_dialog.dart';
-import 'package:ToDo/domain/task/task.dart';
-import 'package:ToDo/flutter/view/widgets/color_chose_dialog.dart';
+import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
+import 'package:ToDo/presentation/blocs/task_dialog.dart';
 import 'package:flutter/material.dart';
 
-class TaskDialog extends StatelessWidget {
-  final Function(
-    Task task,
-  ) onSaveButton;
-  final String dialogText;
-  final TaskDialogBloc bloc;
+import 'color_chose_dialog.dart';
 
-  final TextEditingController taskController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final List<Color> colorPalette;
-  final Color saveButtonColor;
-  final Color cancelButtonColor;
+class TaskDialog extends StatelessWidget {
+  final Function(Task task) _onSaveButton;
+  final String _dialogText;
+  final TaskDialogBloc _bloc;
+
+  final TextEditingController _taskController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final List<Color> _colorPalette;
+  final Color _saveButtonColor;
+  final Color _cancelButtonColor;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String task, description;
-  Color color;
-
-  Task taskO;
+  String _taskText, _descriptionText;
+  Color _color;
 
   TaskDialog({
-    @required this.onSaveButton,
-    @required this.dialogText,
-    @required this.bloc,
+    @required Function(Task task) onSaveButton,
+    @required String dialogText,
+    @required TaskDialogBloc bloc,
     Key key,
-    this.color = Colors.cyan,
-    this.task = '',
-    this.description = '',
-    this.cancelButtonColor = Colors.redAccent,
-    this.saveButtonColor = Colors.greenAccent,
-    this.colorPalette = const <Color>[
+    Color color = Colors.cyan,
+    String taskText = '',
+    String descriptionText = '',
+    Color cancelButtonColor = Colors.redAccent,
+    Color saveButtonColor = Colors.greenAccent,
+    List<Color> colorPalette = const <Color>[
       Colors.yellow,
       Colors.green,
       Colors.red,
@@ -43,12 +40,21 @@ class TaskDialog extends StatelessWidget {
       Colors.orange,
       Colors.indigo,
     ],
-  }) : super(key: key);
+  })  : _onSaveButton = onSaveButton,
+        _dialogText = dialogText,
+        _bloc = bloc,
+        _taskText = taskText,
+        _descriptionText = descriptionText,
+        _cancelButtonColor = cancelButtonColor,
+        _saveButtonColor = saveButtonColor,
+        _colorPalette = colorPalette,
+        _color = color,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    taskController.text = task;
-    descriptionController.text = description;
+    _taskController.text = _taskText;
+    _descriptionController.text = _descriptionText;
     return Dialog(
       child: SingleChildScrollView(
         child: Form(
@@ -58,13 +64,13 @@ class TaskDialog extends StatelessWidget {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsetsDirectional.only(top: 8.0),
-                child: Text(dialogText),
+                child: Text(_dialogText),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: TextFormField(
-                  controller: taskController,
-                  onChanged: (String value) => task = value,
+                  controller: _taskController,
+                  onChanged: (String value) => _taskText = value,
                   validator: (String value) {
                     if (value.isEmpty) {
                       return 'Please enter some task';
@@ -78,8 +84,8 @@ class TaskDialog extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: TextFormField(
-                  controller: descriptionController,
-                  onChanged: (String value) => description = value,
+                  controller: _descriptionController,
+                  onChanged: (String value) => _descriptionText = value,
                   validator: (String value) {
                     if (value.isEmpty) {
                       return 'Please enter some description';
@@ -97,14 +103,14 @@ class TaskDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     MaterialButton(
-                      color: saveButtonColor,
+                      color: _saveButtonColor,
                       child: const Text('save'),
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
-                          onSaveButton(Task(
-                            task: taskController.text,
-                            taskDescription: descriptionController.text,
-                            color: color.value,
+                          _onSaveButton(Task(
+                            task: _taskController.text,
+                            taskDescription: _descriptionController.text,
+                            color: _color.value,
                           ));
                           _closeDialog(context);
                         }
@@ -112,25 +118,24 @@ class TaskDialog extends StatelessWidget {
                     ),
                     const Spacer(),
                     StreamBuilder<BlocState<dynamic>>(
-                        stream: bloc.stateStream,
+                        stream: _bloc.stateStream,
                         builder: (BuildContext context,
                             AsyncSnapshot<BlocState<dynamic>> snapshot) {
-                          color = _getColorFromSnapshot(snapshot);
+                          _color = _getColorFromSnapshot(snapshot);
                           return MaterialButton(
-                            color: color,
+                            color: _color,
                             child: const Text('color'),
                             onPressed: () {
                               _showColorPicker(context)
                                   .then((ColorChooseDialog value) {
-                                color = color;
-                                _sendColorChangedToBloc(color);
+                                _sendColorChangedToBloc(_color);
                               });
                             },
                           );
                         }),
                     const Spacer(),
                     MaterialButton(
-                      color: cancelButtonColor,
+                      color: _cancelButtonColor,
                       child: const Text('cancel'),
                       onPressed: () => _closeDialog(context),
                     ),
@@ -146,17 +151,16 @@ class TaskDialog extends StatelessWidget {
 
   void changeColor(Color color) {
     print(color);
-    this.color = color;
+    _color = color;
   }
 
   Future<ColorChooseDialog> _showColorPicker(BuildContext context) async {
     return showDialog<ColorChooseDialog>(
       context: context,
       child: ColorChooseDialog(
-        defaultColor: color,
-        color: color,
+        defaultColor: _color,
         label: 'Chose color',
-        colors: colorPalette,
+        colorPalette: _colorPalette,
         onColorChosen: changeColor,
       ),
     );
@@ -171,7 +175,7 @@ class TaskDialog extends StatelessWidget {
         return Color(colorChange.stateData);
       }
     }
-    return color;
+    return _color;
   }
 
   void _closeDialog(BuildContext context) {
@@ -179,20 +183,20 @@ class TaskDialog extends StatelessWidget {
   }
 
   void _sendEventToBloc(BlocEvent event) {
-    bloc.eventSink.add(event);
+    _bloc.eventSink.add(event);
   }
 
   void _sendColorChangedToBloc(Color color) {
     _sendEventToBloc(ColorChangedEvent(color.value));
   }
 
-  String get getTask => task;
+  String get getTask => _taskText;
 
-  String get getDescription => description;
+  String get getDescription => _descriptionText;
 
-  Color get colors => color;
+  Color get color => _color;
 
-  set setTask(String val) => task = val;
+  set setTask(String val) => _taskText = val;
 
-  set setDescription(String val) => description = val;
+  set setDescription(String val) => _descriptionText = val;
 }

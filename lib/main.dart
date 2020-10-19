@@ -1,15 +1,16 @@
-import 'package:ToDo/blocs/home_page.dart';
-import 'package:ToDo/blocs/settings_drawer.dart';
-import 'package:ToDo/domain/setting/repository/repository.dart';
-import 'package:ToDo/domain/task/repository/repository.dart';
-import 'package:ToDo/settings_provider.dart';
+import 'package:ToDo/presentation/blocs/home_page.dart';
+import 'package:ToDo/presentation/blocs/settings_drawer.dart';
+import 'package:ToDo/presentation/flutter/view/pages/home.dart';
+import 'package:ToDo/tools/settings_provider.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'domain/setting/repository/shared_preferences.dart';
-import 'domain/task/repository/file_system.dart';
-import 'flutter/view/pages/home.dart';
+import 'data/repository/file_system_task.dart';
+import 'data/repository/shared_preferences_settings.dart';
+import 'domain/repositories/settings_repository.dart';
+import 'domain/repositories/task_repository.dart';
+
 
 void main() {
   runApp(ToDoApp());

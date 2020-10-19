@@ -1,8 +1,8 @@
-import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/home_page.dart';
-import 'package:ToDo/domain/task/task.dart';
-import 'package:ToDo/flutter/view/widgets/task_dialog.dart';
+import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/home_page.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
+import 'package:ToDo/presentation/flutter/view/widgets/task_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
@@ -37,7 +37,14 @@ class TaskWidget extends StatefulWidget {
         _dialog = dialog,
         _taskText = task.task,
         _description = task.description,
-        _isCompleted = task.isCompleted;
+        _isCompleted = task.isCompleted,
+        super(
+            key: ValueKey<int>(task.hashCode +
+                taskColor.hashCode +
+                descriptionColor.hashCode +
+                bloc.hashCode +
+                onPress.hashCode +
+                onLongPress.hashCode));
 
   @override
   _TaskWidgetState createState() => _TaskWidgetState(
@@ -107,40 +114,40 @@ class _TaskWidgetState extends State<TaskWidget> {
                     width: double.infinity,
                     child: FlatButton(
                       onPressed: () {
-                        setState(() {
-                          _isCompleted = !_isCompleted;
-                        });
+                        _isCompleted = !_isCompleted;
                         _sendEventToBloc(TaskPressedEvent(
                           task: Task(
                               task: _task.task,
                               taskDescription: _task.description,
                               color: _task.color,
                               isCompleted: !_task.isCompleted,
-                              id: _task.id
-                          ),
+                              id: _task.id),
                         ));
                         _onPress();
                       },
                       onLongPress: () {
-                        _dialog.color = _mainColor;
+                        _dialog.changeColor(_mainColor);
                         _dialog.setTask = _taskText;
                         _dialog.setDescription = _description;
                         showDialog<TaskDialog>(context: context, child: _dialog)
                             .then((TaskDialog value) {
                           if (value != null) {
-                            setState(() {
-                              _taskText = value.getTask;
-                              _description = value.getDescription;
-                              _mainColor = value.color;
-                            });
-                            _sendEventToBloc(TaskLongPressedEvent(
-                              task: Task(
-                                  task: _taskText,
-                                  taskDescription: _description,
-                                  color: value.color.value,
-                                  isCompleted: _isCompleted,
-                                  id: _task.id),
-                            ));
+                            _taskText = value.getTask;
+                            _description = value.getDescription;
+                            _mainColor = value.color;
+
+                            final Task _newTask = Task(
+                              task: _taskText,
+                              taskDescription: _description,
+                              color: value.color.value,
+                              isCompleted: _isCompleted,
+                              id: _task.id,
+                            );
+                            if (!_newTask.equal(_task)) {
+                              _sendEventToBloc(TaskLongPressedEvent(
+                                task: _newTask,
+                              ));
+                            }
                           }
                         });
                         _onLongPress();
@@ -174,9 +181,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                               value: _isCompleted,
                               onChanged: (bool status) {
                                 _sendEventToBloc(TaskPressedEvent(task: _task));
-                                setState(() {
-                                  _isCompleted = !_isCompleted;
-                                });
+                                _isCompleted = !_isCompleted;
                                 _onPress();
                               }),
                         ],
@@ -209,5 +214,19 @@ class _TaskWidgetState extends State<TaskWidget> {
 
   void _sendEventToBloc(BlocEvent event) {
     _bloc.eventSink.add(event);
+  }
+}
+
+extension on Task {
+  bool equal(Task task) {
+    if (task.task == this.task &&
+        task.description == description &&
+        task.color == color &&
+        task.id == id &&
+        task.isCompleted == isCompleted) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

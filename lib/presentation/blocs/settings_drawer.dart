@@ -1,7 +1,7 @@
-import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/domain/setting/setting.dart';
-import 'package:ToDo/settings_provider.dart';
+import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
+import 'package:ToDo/tools/settings_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SettingsDrawerBloc {

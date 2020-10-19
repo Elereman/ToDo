@@ -1,5 +1,5 @@
-import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TaskDialogBloc {

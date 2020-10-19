@@ -1,20 +1,29 @@
-import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/settings_drawer.dart';
-import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/domain/setting/setting.dart';
-import 'package:ToDo/flutter/view/widgets/color_chose_dialog.dart';
+import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/settings_drawer.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
 import 'package:flutter/material.dart';
+import 'package:ToDo/bool_parsing.dart';
 
-class SettingsDrawer extends StatelessWidget {
+import 'color_chose_dialog.dart';
+
+class SettingsDrawer extends StatelessWidget{
   final List<Color> _colorPalette;
-  final Function _onClearAllButton;
+  final Function _onDeleteAllButton;
   final Function(BuildContext context) _onThemeSwitch;
   final SettingsDrawerBloc _bloc;
 
-  const SettingsDrawer(this._colorPalette, this._onClearAllButton,
-      this._onThemeSwitch, this._bloc,
-      {Key key})
-      : super(key: key);
+  const SettingsDrawer(
+      {Key key,
+      Function onDeleteAllButton,
+      List<Color> colorPalette,
+      Function(BuildContext context) onThemeSwitch,
+      SettingsDrawerBloc bloc})
+      : _onDeleteAllButton = onDeleteAllButton,
+        _colorPalette = colorPalette,
+        _onThemeSwitch = onThemeSwitch,
+        _bloc = bloc,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +40,7 @@ class SettingsDrawer extends StatelessWidget {
                   _listSettingsToMap(_settings);
               print('settings:::::::::::::::::: $_settings');
               print('dark mode:::::::::::::::::: ${_settingsMap['dark_mode']}');
-              print(
-                  'dark mode switch position ${toBoolean(_settingsMap['dark_mode'])}');
+              print('dark mode switch position ${_settingsMap['dark_mode'].parseBool()}');
               return ListView(
                 padding: EdgeInsets.zero,
                 children: <Widget>[
@@ -52,9 +60,10 @@ class SettingsDrawer extends StatelessWidget {
                         const Spacer(),
                         Switch(
                             value: _settingsMap.containsKey('dark_mode') &&
-                                toBoolean(_settingsMap['dark_mode']),
-                            onChanged: _isDarkModeEnable(context) ? null : (bool value) =>
-                                _changeTheme(value, context)),
+                                _settingsMap['dark_mode'].parseBool(),
+                            onChanged: _isDarkModeEnable(context)
+                                ? null
+                                : (bool value) => _changeTheme(value, context)),
                       ],
                     ),
                   ),
@@ -69,16 +78,18 @@ class SettingsDrawer extends StatelessWidget {
                             _showColorChoseDialog(
                                 context,
                                 ColorChooseDialog(
-                                    colors: _colorPalette,
+                                    colorPalette: _colorPalette,
                                     onColorChosen: _changeTaskColor,
                                     label: 'Chose task color',
-                                    defaultColor: _settingsMap
-                                            .containsKey('task_color')
-                                        ? toColor(_settingsMap['task_color'])
-                                        : _colorPalette[0]));
+                                    defaultColor:
+                                        _settingsMap.containsKey('task_color')
+                                            ? _parseColorFromString(
+                                                _settingsMap['task_color'])
+                                            : _colorPalette[0]));
                           },
                           color: _settingsMap.containsKey('task_color')
-                              ? toColor(_settingsMap['task_color'])
+                              ? _parseColorFromString(
+                                  _settingsMap['task_color'])
                               : _colorPalette[0],
                         ),
                       ],
@@ -95,17 +106,18 @@ class SettingsDrawer extends StatelessWidget {
                             _showColorChoseDialog(
                                 context,
                                 ColorChooseDialog(
-                                    colors: _colorPalette,
+                                    colorPalette: _colorPalette,
                                     onColorChosen: _changeDescriptionColor,
                                     label: 'Chose description color',
                                     defaultColor: _settingsMap
                                             .containsKey('description_color')
-                                        ? toColor(
+                                        ? _parseColorFromString(
                                             _settingsMap['description_color'])
                                         : _colorPalette[1]));
                           },
                           color: _settingsMap.containsKey('description_color')
-                              ? toColor(_settingsMap['description_color'])
+                              ? _parseColorFromString(
+                                  _settingsMap['description_color'])
                               : _colorPalette[1],
                         ),
                       ],
@@ -122,7 +134,7 @@ class SettingsDrawer extends StatelessWidget {
                   MaterialButton(
                     color: Theme.of(context).bottomAppBarColor,
                     child: const Text('Delete all tasks'),
-                    onPressed: () => _onClearAllButton(),
+                    onPressed: () => _onDeleteAllButton(),
                   ),
                 ],
               );
@@ -132,7 +144,7 @@ class SettingsDrawer extends StatelessWidget {
   }
 
   bool _isDarkModeEnable(BuildContext context) {
-    if(MediaQuery.of(context).platformBrightness == Brightness.dark) {
+    if (MediaQuery.of(context).platformBrightness == Brightness.dark) {
       return true;
     } else {
       return false;
@@ -183,15 +195,7 @@ class SettingsDrawer extends StatelessWidget {
     return _result;
   }
 
-  bool toBoolean(String str) {
-    if (str == 'true') {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  Color toColor(String str) {
+  Color _parseColorFromString(String str) {
     return Color(int.parse(str));
   }
 }

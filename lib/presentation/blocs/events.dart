@@ -1,5 +1,5 @@
-import 'package:ToDo/domain/setting/setting.dart';
-import 'package:ToDo/domain/task/task.dart';
+import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'file:///D:/ToDo/lib/domain/entities/task.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class BlocEvent with _GetRuntimeType {}

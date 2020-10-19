@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/domain/setting/setting.dart';
+import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'package:ToDo/domain/repositories/settings_repository.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
 import 'package:rxdart/rxdart.dart';
-
-import 'blocs/events.dart';
-import 'domain/setting/repository/repository.dart';
 
 class SettingsProvider {
   final BehaviorSubject<BlocEvent> _eventStreamController;

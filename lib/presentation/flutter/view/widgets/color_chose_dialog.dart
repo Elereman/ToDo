@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 
 class ColorChooseDialog extends StatelessWidget {
-  final List<Color> colors;
-  final void Function(Color) onColorChosen;
-  final String label;
-  final Color defaultColor;
-  final Color color;
+  final List<Color> _colorPalette;
+  final void Function(Color) _onColorChosen;
+  final String _label;
+  final Color _defaultColor;
 
   const ColorChooseDialog(
-      {@required this.colors,
-      @required this.onColorChosen,
-      @required this.label,
-      @required this.defaultColor,
-      Key key,
-      this.color = Colors.cyan})
-      : super(key: key);
+      {@required List<Color> colorPalette,
+      @required void Function(Color) onColorChosen,
+      @required String label,
+      @required Color defaultColor,
+      Key key,})
+      : _colorPalette = colorPalette,
+        _onColorChosen = onColorChosen,
+        _label = label,
+        _defaultColor = defaultColor,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class ColorChooseDialog extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Container(
-              child: Text(label),
+              child: Text(_label),
               alignment: Alignment.center,
             ),
           ),
@@ -33,7 +35,9 @@ class ColorChooseDialog extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: Wrap(
               spacing: 5,
-              children: <MaterialButton>[..._generateFromColors(colors, context)],
+              children: <MaterialButton>[
+                ..._generateFromColors(_colorPalette, context)
+              ],
             ),
           ),
         ],
@@ -45,16 +49,18 @@ class ColorChooseDialog extends StatelessWidget {
     Navigator.of(context, rootNavigator: true).pop(this);
   }
 
-  List<MaterialButton> _generateFromColors(List<Color> colors, BuildContext context) {
+  Color get defaultColor => _defaultColor;
+
+  List<MaterialButton> _generateFromColors(
+      List<Color> colors, BuildContext context) {
     final List<MaterialButton> result = <MaterialButton>[];
     colors.forEach((Color element) {
       MaterialButton button;
       button = RaisedButton(
         onPressed: () {
-          //color = element;
-          onColorChosen(element);
+          _onColorChosen(element);
           _closeDialog(context);
-          },
+        },
         color: element,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       );
@@ -62,6 +68,4 @@ class ColorChooseDialog extends StatelessWidget {
     });
     return result;
   }
-
-  //Color get chosenColor => color;
 }

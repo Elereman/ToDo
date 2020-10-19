@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:ToDo/blocs/events.dart';
-import 'package:ToDo/blocs/states.dart';
-import 'package:ToDo/domain/setting/setting.dart';
-import 'package:ToDo/domain/task/repository/repository.dart';
-import 'package:ToDo/domain/task/task.dart';
+import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/domain/repositories/task_repository.dart';
+import 'package:ToDo/presentation/blocs/events.dart';
+import 'package:ToDo/presentation/blocs/states.dart';
+import 'package:ToDo/tools/settings_provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:ToDo/settings_provider.dart';
 
 class HomePageBloc {
   final BehaviorSubject<BlocEvent> _eventStreamController;

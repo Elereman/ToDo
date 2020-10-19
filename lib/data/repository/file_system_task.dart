@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ToDo/domain/task/task.dart';
+import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/domain/repositories/task_repository.dart';
 import 'package:path_provider/path_provider.dart';
-
-import 'repository.dart';
 
 class FileSystemRepository implements TaskRepository {
   final String _fileName = 'todos.fs';
@@ -28,6 +27,7 @@ class FileSystemRepository implements TaskRepository {
     final File file = await _localFile;
     file.deleteSync();
     file.createSync();
+    print('codec encode ${_codec.encode(tasks)}');
     return await file.writeAsString(_codec.encode(tasks));
   }
 

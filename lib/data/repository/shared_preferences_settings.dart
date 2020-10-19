@@ -1,5 +1,5 @@
-import 'package:ToDo/domain/setting/repository/repository.dart';
-import 'package:ToDo/domain/setting/setting.dart';
+import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'package:ToDo/domain/repositories/settings_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesSettingsRepository implements SettingsRepository {
@@ -16,7 +16,6 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
       if(preferences.getString(key) == null) {
         await resetAll();
       }
-      print('Setting:::::: ${preferences.getString(key)}');
     });
     return;
   }
