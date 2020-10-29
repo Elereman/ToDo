@@ -1,10 +1,6 @@
-import 'package:ToDo/domain/entities/task.dart';
-import 'package:ToDo/domain/repositories/task_repository.dart';
+import 'package:ToDo/core/usecases/usecase_with_params.dart';
 
-class DeleteTaskUseCase {
-  TaskRepository _repository;
-
-  Future<Task> execute() {
-
-  }
+abstract class DeleteTaskUseCase implements UseCaseWithParams<Future<bool>, int> {
+  @override
+  Future<bool> call(int task);
 }

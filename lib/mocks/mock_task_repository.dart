@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/domain/entities/task.dart';
 import 'package:ToDo/domain/repositories/task_repository.dart';
 
 class MockTaskRepository implements TaskRepository {
@@ -36,16 +36,16 @@ class MockTaskRepository implements TaskRepository {
   };
 
   @override
-  Future<bool> create(Task task) async {
+  Future<Task> create(Task task) async {
     const JsonCodec _codec = JsonCodec();
     print(_codec.encode(<Task>[task]));
     _tasks.putIfAbsent(task.id, () => task);
-    return true;
+    return task;
   }
 
   @override
-  Future<bool> delete(Task task) async {
-    _tasks.remove(task.id);
+  Future<bool> delete(int task) async {
+    _tasks.remove(task);
     return true;
   }
 
@@ -78,4 +78,7 @@ class MockTaskRepository implements TaskRepository {
   Future<bool> deleteAll() async {
     return true;
   }
+
+  @override
+  Future<Task> get(int id) async => _tasks[id];
 }

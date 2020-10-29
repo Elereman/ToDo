@@ -1,19 +1,22 @@
-import 'file:///D:/ToDo/lib/domain/entities/setting.dart';
+import 'package:ToDo/domain/entities/setting.dart';
 import 'package:ToDo/domain/repositories/settings_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesSettingsRepository implements SettingsRepository {
   final Map<String, String> defaults = <String, String>{
-    'task_color':'4278190080',
-    'description_color':'4288585374',
-    'dark_mode':'false',
+    'task_color': '4278190080',
+    'description_color': '4288585374',
+    'dark_mode': 'false',
   };
 
-  @override
+  SharedPreferencesSettingsRepository() {
+    initialize();
+  }
+
   Future<void> initialize() async {
     final SharedPreferences preferences = await _prefs;
     defaults.forEach((String key, String value) async {
-      if(preferences.getString(key) == null) {
+      if (preferences.getString(key) == null) {
         await resetAll();
       }
     });
@@ -35,9 +38,9 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
   }
 
   @override
-  Future<Setting<String>> read(Setting<String> setting) async {
+  Future<Setting<String>> read(String setting) async {
     final SharedPreferences preferences = await _prefs;
-    return Setting<String>(setting.key, preferences.getString(setting.key));
+    return Setting<String>(setting, preferences.getString(setting));
   }
 
   Future<SharedPreferences> get _prefs async =>
@@ -53,10 +56,10 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
   }
 
   @override
-  Future<List<Setting<String>>> readAll() async {
-    final List<Setting<String>> result = <Setting<String>>[];
+  Future<Map<String, Setting<String>>> readAll() async {
+    final Map<String, Setting<String>> result = <String, Setting<String>>{};
     defaults.forEach((String key, String value) async {
-      result.add(await read(Setting<String>(key, '')));
+      result[key] = await read(key);
     });
     return result;
   }

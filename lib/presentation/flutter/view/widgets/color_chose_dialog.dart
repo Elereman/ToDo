@@ -54,14 +54,14 @@ class ColorChooseDialog extends StatelessWidget {
   List<MaterialButton> _generateFromColors(
       List<Color> colors, BuildContext context) {
     final List<MaterialButton> result = <MaterialButton>[];
-    colors.forEach((Color element) {
+    colors.forEach((Color _color) {
       MaterialButton button;
       button = RaisedButton(
         onPressed: () {
-          _onColorChosen(element);
+          _onColorChosen(_color);
           _closeDialog(context);
         },
-        color: element,
+        color: _color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       );
       result.add(button);

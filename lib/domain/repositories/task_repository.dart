@@ -1,15 +1,17 @@
-import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/domain/entities/task.dart';
 
 abstract class TaskRepository {
   Future<void> initialize();
+
+  Future<Task> get(int id);
 
   Future<List<Task>> getAll();
 
   Future<bool> deleteAll();
 
-  Future<bool> create(Task task);
+  Future<Task> create(Task task);
 
   Future<Task> update(Task task);
 
-  Future<bool> delete(Task task);
+  Future<bool> delete(int id);
 }

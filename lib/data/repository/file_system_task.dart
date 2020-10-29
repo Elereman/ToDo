@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'file:///D:/ToDo/lib/domain/entities/task.dart';
+import 'package:ToDo/domain/entities/task.dart';
 import 'package:ToDo/domain/repositories/task_repository.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -49,22 +49,23 @@ class FileSystemRepository implements TaskRepository {
   }
 
   @override
-  Future<bool> create(Task task) async {
+  Future<Task> create(Task task) async {
     final List<Task> value = await getAll();
-    await _writeTaskList(<Task>[...value, Task(
-    task: task.task,
-    taskDescription: task.description,
-    color: task.color,
-    isCompleted: task.isCompleted,
-    id: value.length,
-    )]);
-    return true;
+    final Task _createdTask = Task(
+      task: task.task,
+      taskDescription: task.description,
+      color: task.color,
+      isCompleted: task.isCompleted,
+      id: value.length,
+    );
+    await _writeTaskList(<Task>[...value, _createdTask]);
+    return _createdTask;
   }
 
   @override
-  Future<bool> delete(Task task) async {
+  Future<bool> delete(int task) async {
     final List<Task> _tasks = await getAll();
-    _tasks.removeAt(task.id);
+    _tasks.removeAt(task);
     await _writeTaskList(_rebuildIDsInList(_tasks));
     print('deleted');
     return true;
@@ -139,5 +140,11 @@ class FileSystemRepository implements TaskRepository {
     _tasks.insert(task.id, task);
     await _writeTaskList(_tasks);
     return task;
+  }
+
+  @override
+  Future<Task> get(int id) async {
+    final List<Task> _tasks = await getAll();
+    return _tasks[id];
   }
 }
