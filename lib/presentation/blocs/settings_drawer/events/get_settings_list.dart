@@ -1,4 +1,3 @@
-import 'file:///D:/ToDo/lib/core/tools/settings_provider/settings_provider.dart';
 import 'package:ToDo/domain/usecases/get_settings_list.dart';
 import 'package:ToDo/presentation/blocs/settings_drawer/events/event.dart';
 import 'package:ToDo/presentation/blocs/settings_drawer/state.dart';

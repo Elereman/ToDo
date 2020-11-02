@@ -45,8 +45,10 @@ class HomePageBloc {
     eventSubject.add(LoadTasksEvent(
         settingsProvider, GetAllTasksUseCaseThroughRepository(repository)));
     settingsProvider.stateStream.listen((SettingsProviderState state) {
-      _state = HomePageState(_state.tasks, _state.state, state.settings);
-      stateSubject.add(_state);
+      if(_state != null) {
+        _state = HomePageState(_state.tasks, _state.state, state.settings);
+        stateSubject.add(_state);
+      }
     });
     eventSubject.listen((HomePageEvent<HomePageState> event) async {
       _state = await event.reduce(_state);

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:ToDo/domain/entities/task.dart';
 import 'package:ToDo/presentation/blocs/home_page/bloc.dart';
 import 'package:ToDo/presentation/blocs/home_page/state.dart';
@@ -12,9 +14,6 @@ class HomePage extends StatelessWidget {
   final HomePageBloc bloc;
   final SettingsDrawerBloc settingsBloc;
   final TaskDialog taskDialog;
-
-  static const Color _defaultTextColor = Colors.black;
-  static const Color _defaultDescriptionColor = Colors.grey;
 
   HomePage(
       {@required this.bloc,
@@ -69,7 +68,7 @@ class HomePage extends StatelessWidget {
           Colors.black38,
         ],
         onDeleteAllButton: bloc.deleteAllTasks,
-        onThemeSwitch: _changeTheme,
+        onThemeSwitch: _toggleDarkMode,
         bloc: settingsBloc,
       ),
       appBar: AppBar(
@@ -88,7 +87,7 @@ class HomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          final TaskDialog _taskDialog = TaskDialog(
+          const TaskDialog _taskDialog = TaskDialog(
             dialogText: 'Create new task',
           );
           showDialog<Task>(context: context, child: _taskDialog)
@@ -104,11 +103,11 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _changeTheme(BuildContext context) {
-    final Brightness _currentBrightness = DynamicTheme.of(context).brightness;
-    DynamicTheme.of(context).setBrightness(
-        _currentBrightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light);
+  void _toggleDarkMode(BuildContext context, bool enabled) {
+    if(enabled) {
+      DynamicTheme.of(context).setBrightness(Brightness.dark);
+    } else {
+      DynamicTheme.of(context).setBrightness(Brightness.light);
+    }
   }
 }

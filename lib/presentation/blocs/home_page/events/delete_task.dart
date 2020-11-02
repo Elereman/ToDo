@@ -24,8 +24,8 @@ class DeleteTaskEvent implements HomePageEvent<HomePageState> {
       if (element.id == id + 1) {
         newElement = Task(
           id: id,
-          task: element.task,
-          taskDescription: element.description,
+          text: element.text,
+          description: element.description,
           color: element.color,
           isCompleted: element.isCompleted,
         );

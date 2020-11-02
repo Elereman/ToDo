@@ -9,14 +9,14 @@ import 'color_chose_dialog.dart';
 class SettingsDrawer extends StatelessWidget {
   final List<Color> _colorPalette;
   final Function _onDeleteAllButton;
-  final Function(BuildContext context) _onThemeSwitch;
+  final Function(BuildContext context, bool enabled) _onThemeSwitch;
   final SettingsDrawerBloc _bloc;
 
   const SettingsDrawer(
       {Key key,
       Function onDeleteAllButton,
       List<Color> colorPalette,
-      Function(BuildContext context) onThemeSwitch,
+      Function(BuildContext context, bool enabled) onThemeSwitch,
       SettingsDrawerBloc bloc})
       : _onDeleteAllButton = onDeleteAllButton,
         _colorPalette = colorPalette,
@@ -34,8 +34,16 @@ class SettingsDrawer extends StatelessWidget {
                 AsyncSnapshot<SettingsDrawerState> snapshot) {
               _bloc.getSettingsList();
               if (snapshot.hasData) {
-                return ListView(
+                final bool _isDarkModeEnabled = snapshot.data.settings
+                    .containsKey('dark_mode') &&
+                    snapshot.data.settings['dark_mode'].setting
+                        .parseBool();
+                if(_isDarkModeEnabled) {
+
+                }
+                return SingleChildScrollView(
                   padding: EdgeInsets.zero,
+                  child: Column(
                   children: <Widget>[
                     Container(
                       color: Theme.of(context).bottomAppBarColor,
@@ -52,10 +60,7 @@ class SettingsDrawer extends StatelessWidget {
                           const Text('Dark theme'),
                           const Spacer(),
                           Switch(
-                              value: snapshot.data.settings
-                                      .containsKey('dark_mode') &&
-                                  snapshot.data.settings['dark_mode'].setting
-                                      .parseBool(),
+                              value: _isDarkModeEnabled,
                               onChanged: _isDarkModeEnable(context)
                                   ? null
                                   : (bool value) =>
@@ -133,7 +138,6 @@ class SettingsDrawer extends StatelessWidget {
                       child: const Text('Restore defaults'),
                       onPressed: () {
                         _bloc.resetSettings();
-                        _onThemeSwitch(context);
                       },
                     ),
                     MaterialButton(
@@ -142,6 +146,7 @@ class SettingsDrawer extends StatelessWidget {
                       onPressed: () => _onDeleteAllButton(),
                     ),
                   ],
+                  )
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -176,7 +181,7 @@ class SettingsDrawer extends StatelessWidget {
 
   void _changeTheme(bool value, BuildContext context) {
     _bloc.editSetting(Setting<String>('dark_mode', value.toString()));
-    _onThemeSwitch(context);
+    _onThemeSwitch(context, value);
   }
 
   Color _parseColorFromString(String str) {

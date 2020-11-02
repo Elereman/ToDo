@@ -13,6 +13,7 @@ class TaskDialog extends StatefulWidget {
   final String _taskText, _descriptionText, _buttonText, _colorChooserLabel;
   final Color _color;
   final int _id;
+  final bool _isCompleted;
 
   const TaskDialog({
     @required String dialogText,
@@ -24,6 +25,7 @@ class TaskDialog extends StatefulWidget {
     String colorChooserLabel = 'Choose color',
     Color cancelButtonColor = Colors.redAccent,
     Color saveButtonColor = Colors.greenAccent,
+    bool isCompleted = false,
     int id = -1,
     List<Color> colorPalette = const <Color>[
       Colors.yellow,
@@ -43,6 +45,7 @@ class TaskDialog extends StatefulWidget {
         _saveButtonColor = saveButtonColor,
         _colorPalette = colorPalette,
         _color = color,
+        _isCompleted = isCompleted,
         super(key: key);
 
   TaskDialog.fromTask({
@@ -62,7 +65,7 @@ class TaskDialog extends StatefulWidget {
       Colors.indigo,
     ],
   })  : _dialogText = dialogText,
-        _taskText = task.task,
+        _taskText = task.text,
         _buttonText = buttonText,
         _colorChooserLabel = colorChooserLabel,
         _descriptionText = task.description,
@@ -71,6 +74,7 @@ class TaskDialog extends StatefulWidget {
         _saveButtonColor = saveButtonColor,
         _colorPalette = colorPalette,
         _color = Color(task.color),
+        _isCompleted = task.isCompleted,
         super(key: key);
 
   @override
@@ -148,9 +152,10 @@ class _TaskDialogState extends State<TaskDialog> {
                               context,
                               Task(
                                 id: widget._id,
-                                task: _taskController.text,
-                                taskDescription: _descriptionController.text,
+                                text: _taskController.text,
+                                description: _descriptionController.text,
                                 color: _color.value,
+                                isCompleted: widget._isCompleted,
                               ));
                         }
                       },
