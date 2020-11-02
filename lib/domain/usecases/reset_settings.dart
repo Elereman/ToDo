@@ -1,6 +1,8 @@
 import 'package:ToDo/core/usecases/usecase_without_params.dart';
+import 'package:ToDo/domain/entities/setting.dart';
 
-abstract class ResetSettingsListUseCase implements UseCaseWithoutParams<Future<bool>> {
+abstract class ResetSettingsUseCase
+    implements UseCaseWithoutParams<Future<Map<String, Setting<String>>>> {
   @override
-  Future<bool> call();
+  Future<Map<String, Setting<String>>> call();
 }

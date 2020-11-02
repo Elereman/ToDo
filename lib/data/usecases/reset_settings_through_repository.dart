@@ -1,12 +1,19 @@
-import 'package:ToDo/domain/repositories/settings_repository.dart';
+import 'package:ToDo/core/tools/settings_provider/settings_provider.dart';
+import 'package:ToDo/core/tools/settings_provider/settings_provider_state.dart';
+import 'package:ToDo/domain/entities/setting.dart';
 import 'package:ToDo/domain/usecases/reset_settings.dart';
 
-class ResetSettingsListUseCaseThroughRepository
-    implements ResetSettingsListUseCase {
-  final SettingsRepository _repository;
+class ResetSettingsUseCaseThroughRepository implements ResetSettingsUseCase {
+  final SettingsProvider _settingsProvider;
 
-  ResetSettingsListUseCaseThroughRepository(this._repository);
+  ResetSettingsUseCaseThroughRepository(this._settingsProvider);
 
   @override
-  Future<bool> call() => _repository.resetAll();
+  Future<Map<String, Setting<String>>> call() async {
+    await _settingsProvider.resetAllSettings();
+    await _settingsProvider.resetAllSettings();
+    final SettingsProviderState _settingsState =
+        await _settingsProvider.stateStream.first;
+    return _settingsState.settings;
+  }
 }

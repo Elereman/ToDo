@@ -1,12 +1,18 @@
+import 'package:ToDo/core/tools/settings_provider/settings_provider.dart';
+import 'package:ToDo/core/tools/settings_provider/settings_provider_state.dart';
 import 'package:ToDo/domain/entities/setting.dart';
-import 'package:ToDo/domain/repositories/settings_repository.dart';
 import 'package:ToDo/domain/usecases/get_setting.dart';
 
 class GetSettingUseCaseThroughRepository implements GetSettingUseCase {
-  final SettingsRepository _repository;
+  final SettingsProvider _settingsProvider;
 
-  GetSettingUseCaseThroughRepository(this._repository);
+  GetSettingUseCaseThroughRepository(this._settingsProvider);
 
   @override
-  Future<Setting<String>> call(String setting) => _repository.read(setting);
+  Future<Setting<String>> call(String setting) async {
+    await _settingsProvider.requireAllSettings();
+    final SettingsProviderState _settingsState =
+        await _settingsProvider.stateStream.first;
+    return _settingsState.settings[setting];
+  }
 }

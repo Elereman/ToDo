@@ -57,23 +57,14 @@ class TaskWidget extends StatelessWidget {
                   _onPress(_changeTaskCompletedState(_task));
                 },
                 onLongPress: () {
-                  final TaskDialog _dialog = TaskDialog(
-                    onSaveButton: (_) {},
+                  final TaskDialog _dialog = TaskDialog.fromTask(
                     dialogText: 'Edit task',
-                    taskText: _task.task,
-                    descriptionText: _task.description,
+                    task: _task,
                   );
-                  showDialog<TaskDialog>(context: context, child: _dialog)
-                      .then((TaskDialog _dialog) {
-                    if (_dialog != null) {
-                      final Task _newTask = Task(
-                        task: _taskText,
-                        taskDescription: _description,
-                        //color: _dialog.color.value,
-                        isCompleted: _isCompleted,
-                        id: _task.id,
-                      );
-                      _onLongPress(_newTask);
+                  showDialog<Task>(context: context, child: _dialog)
+                      .then((Task _task) {
+                    if (_task != null) {
+                      _onLongPress(_task);
                     }
                   });
                 },

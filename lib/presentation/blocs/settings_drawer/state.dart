@@ -1,9 +1,9 @@
 import 'package:ToDo/domain/entities/setting.dart';
 
-class SettingsState {
+class SettingsDrawerState {
   final Map<String, Setting<String>> _settings;
 
-  SettingsState(this._settings);
+  SettingsDrawerState(this._settings);
 
   Map<String, Setting<String>> get settings => _settings;
 }

@@ -1,4 +1,4 @@
-import 'package:ToDo/core/tools/settings_provider.dart';
+import 'package:ToDo/core/tools/settings_provider/settings_provider.dart';
 import 'package:ToDo/data/usecases/get_all_tasks_through_repository.dart';
 import 'package:ToDo/domain/entities/task.dart';
 import 'package:ToDo/domain/repositories/task_repository.dart';
@@ -42,12 +42,16 @@ class HomePageBloc {
       : stateSubject = BehaviorSubject<HomePageState>(),
         eventSubject = BehaviorSubject<HomePageEvent<HomePageState>>(),
         super() {
+    eventSubject.add(LoadTasksEvent(
+        settingsProvider, GetAllTasksUseCaseThroughRepository(repository)));
+    settingsProvider.stateStream.listen((SettingsProviderState state) {
+      _state = HomePageState(_state.tasks, _state.state, state.settings);
+      stateSubject.add(_state);
+    });
     eventSubject.listen((HomePageEvent<HomePageState> event) async {
       _state = await event.reduce(_state);
       stateSubject.sink.add(_state);
     });
-    eventSubject.add(LoadTasksEvent(
-        settingsProvider, GetAllTasksUseCaseThroughRepository(repository)));
   }
 
   void createInitialState() {

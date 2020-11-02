@@ -1,7 +1,7 @@
 import 'package:ToDo/domain/entities/task.dart';
 import 'package:ToDo/presentation/blocs/home_page/bloc.dart';
 import 'package:ToDo/presentation/blocs/home_page/state.dart';
-import 'package:ToDo/presentation/blocs/settings_drawer.dart';
+import 'package:ToDo/presentation/blocs/settings_drawer/bloc.dart';
 import 'package:ToDo/presentation/flutter/view/widgets/settings_drawer.dart';
 import 'package:ToDo/presentation/flutter/view/widgets/task.dart';
 import 'package:ToDo/presentation/flutter/view/widgets/task_dialog.dart';
@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
     bloc.createInitialState();
   }
 
-  List<Widget> _stateToWidgets(
+  List<Widget> _getWidgetsFromState(
       AsyncSnapshot<HomePageState> state, BuildContext context) {
     if (state.hasData) {
       final List<Widget> _taskWidgets = <Widget>[];
@@ -36,8 +36,10 @@ class HomePage extends StatelessWidget {
           onDismissed: (Task task) => bloc.deleteTask(task),
           onPress: (Task task) => bloc.updateTask(task),
           onLongPress: (Task task) => bloc.updateTask(task),
-          taskColor: _defaultTextColor,
-          descriptionColor: _defaultDescriptionColor,
+          taskColor:
+              Color(int.parse(state.data.settings['task_color'].setting)),
+          descriptionColor: Color(
+              int.parse(state.data.settings['description_color'].setting)),
         ));
       });
       return _taskWidgets;
@@ -79,7 +81,7 @@ class HomePage extends StatelessWidget {
             //_handleState(_state, context);
             return SingleChildScrollView(
               child: Column(
-                children: _stateToWidgets(_state, context),
+                children: _getWidgetsFromState(_state, context),
               ),
             );
           }),
@@ -87,14 +89,12 @@ class HomePage extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () {
           final TaskDialog _taskDialog = TaskDialog(
-            onSaveButton: (Task task) => bloc.createTask(task),
             dialogText: 'Create new task',
           );
-          showDialog<TaskDialog>(context: context, child: _taskDialog)
-              .then((TaskDialog dialog) {
-            if (dialog != null) {
-              //_chosenColor = value.color;
-              print(dialog.color);
+          showDialog<Task>(context: context, child: _taskDialog)
+              .then((Task task) {
+            if (task != null) {
+              bloc.createTask(task);
             }
           });
         },
