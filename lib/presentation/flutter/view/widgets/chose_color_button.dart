@@ -23,8 +23,7 @@ class ChoseColorButton extends StatefulWidget {
       Colors.orange,
       Colors.indigo,
     ],
-  })
-      : _startColor = startColor,
+  })  : _startColor = startColor,
         _buttonText = buttonText,
         _colorChooserLabel = colorChooserLabel,
         _colorPalette = colorPalette,
@@ -49,7 +48,7 @@ class _ChoseColorButtonState extends State<ChoseColorButton> {
       child: Text(widget._buttonText),
       onPressed: () {
         _showColorPicker(context).then((Color color) {
-          if(color != null) {
+          if (color != null) {
             setState(() {
               _color = color;
             });

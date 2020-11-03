@@ -4,5 +4,5 @@ import 'package:ToDo/domain/entities/setting.dart';
 abstract class GetSettingsListUseCase
     implements UseCaseWithoutParams<Future<Map<String, Setting<String>>>> {
   @override
-  Future<Map<String ,Setting<String>>> call();
+  Future<Map<String, Setting<String>>> call();
 }

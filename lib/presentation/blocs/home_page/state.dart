@@ -15,6 +15,4 @@ class HomePageState {
   List<Task> get tasks => _tasks;
 }
 
-enum State {
-  Loading, Loaded, Error
-}
+enum State { Loading, Loaded, Error }

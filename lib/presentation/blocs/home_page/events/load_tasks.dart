@@ -15,8 +15,8 @@ class LoadTasksEvent implements HomePageEvent<HomePageState> {
   Future<HomePageState> reduce(HomePageState oldState) async {
     final List<Task> _tasks = await _loadTasksUseCase();
     await _settingsProvider.requireAllSettings();
-    final SettingsProviderState _settingsState = await _settingsProvider.stateStream.first;
+    final SettingsProviderState _settingsState =
+        await _settingsProvider.stateStream.first;
     return HomePageState(_tasks, State.Loaded, _settingsState.settings);
   }
 }
-//TODO Refactor it

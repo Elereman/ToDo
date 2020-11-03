@@ -1,4 +1,3 @@
-import 'file:///D:/ToDo/lib/core/assembly/abstract/entity_factory.dart';
 import 'package:ToDo/core/assembly/abstract/task_entity.dart';
 import 'package:ToDo/data/models/task.dart';
 import 'package:ToDo/domain/entities/task.dart';

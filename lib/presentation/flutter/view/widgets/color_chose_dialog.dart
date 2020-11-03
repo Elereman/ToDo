@@ -5,12 +5,12 @@ class ColorChooseDialog extends StatelessWidget {
   final String _label;
   final Color _defaultColor;
 
-  const ColorChooseDialog(
-      {@required List<Color> colorPalette,
-      @required String label,
-      @required Color defaultColor,
-      Key key,})
-      : _colorPalette = colorPalette,
+  const ColorChooseDialog({
+    @required List<Color> colorPalette,
+    @required String label,
+    @required Color defaultColor,
+    Key key,
+  })  : _colorPalette = colorPalette,
         _label = label,
         _defaultColor = defaultColor,
         super(key: key);
