@@ -12,12 +12,11 @@ class SettingsDrawer extends StatelessWidget {
   final Function(BuildContext context, bool enabled) _onThemeSwitch;
   final SettingsDrawerBloc _bloc;
 
-  const SettingsDrawer(
-      {Key key,
-      Function onDeleteAllButton,
-      List<Color> colorPalette,
-      Function(BuildContext context, bool enabled) onThemeSwitch,
-      SettingsDrawerBloc bloc})
+  const SettingsDrawer({Key key,
+    Function onDeleteAllButton,
+    List<Color> colorPalette,
+    Function(BuildContext context, bool enabled) onThemeSwitch,
+    SettingsDrawerBloc bloc})
       : _onDeleteAllButton = onDeleteAllButton,
         _colorPalette = colorPalette,
         _onThemeSwitch = onThemeSwitch,
@@ -38,115 +37,126 @@ class SettingsDrawer extends StatelessWidget {
                     .containsKey('dark_mode') &&
                     snapshot.data.settings['dark_mode'].setting
                         .parseBool();
-                if(_isDarkModeEnabled) {
-
-                }
+                Future<void>.delayed(Duration.zero, () async {
+                  _changeTheme(_isDarkModeEnabled, context);
+                });
                 return SingleChildScrollView(
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                  children: <Widget>[
-                    Container(
-                      color: Theme.of(context).bottomAppBarColor,
-                      child: const Text(
-                        'Settings',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 23),
-                      ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.brush),
-                      title: Row(
-                        children: <Widget>[
-                          const Text('Dark theme'),
-                          const Spacer(),
-                          Switch(
-                              value: _isDarkModeEnabled,
-                              onChanged: _isDarkModeEnable(context)
-                                  ? null
-                                  : (bool value) =>
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Container(
+                          color: Theme
+                              .of(context)
+                              .bottomAppBarColor,
+                          child: const Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text(
+                              'Settings',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 23),
+                            ),
+                          ),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.brush),
+                          title: Row(
+                            children: <Widget>[
+                              const Text('Dark theme'),
+                              const Spacer(),
+                              Switch(
+                                  value: _isDarkModeEnabled,
+                                  onChanged: _isDarkModeEnable(context)
+                                      ? null
+                                      : (bool value) =>
                                       _changeTheme(value, context)),
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.text_format),
-                      title: Row(
-                        children: <Widget>[
-                          const Text('Task color'),
-                          const Spacer(),
-                          MaterialButton(
-                            onPressed: () {
-                              _showColorChoseDialog(
+                            ],
+                          ),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.text_format),
+                          title: Row(
+                            children: <Widget>[
+                              const Text('Task color'),
+                              const Spacer(),
+                              MaterialButton(
+                                onPressed: () {
+                                  _showColorChoseDialog(
                                       context,
                                       ColorChooseDialog(
                                           colorPalette: _colorPalette,
                                           label: 'Chose task color',
                                           defaultColor: snapshot.data.settings
-                                                  .containsKey('task_color')
+                                              .containsKey('task_color')
                                               ? _parseColorFromString(snapshot
-                                                  .data
-                                                  .settings['task_color']
-                                                  .setting)
+                                              .data
+                                              .settings['task_color']
+                                              .setting)
                                               : _colorPalette[0]))
-                                  .then(
-                                      (Color color) => _changeTaskColor(color));
-                            },
-                            color:
+                                      .then(
+                                          (Color color) =>
+                                          _changeTaskColor(color));
+                                },
+                                color:
                                 snapshot.data.settings.containsKey('task_color')
                                     ? _parseColorFromString(snapshot
-                                        .data.settings['task_color'].setting)
+                                    .data.settings['task_color'].setting)
                                     : _colorPalette[0],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.text_format),
-                      title: Row(
-                        children: <Widget>[
-                          const Text('Description color'),
-                          const Spacer(),
-                          MaterialButton(
-                            onPressed: () {
-                              _showColorChoseDialog(
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.text_format),
+                          title: Row(
+                            children: <Widget>[
+                              const Text('Description color'),
+                              const Spacer(),
+                              MaterialButton(
+                                onPressed: () {
+                                  _showColorChoseDialog(
                                       context,
                                       ColorChooseDialog(
                                           colorPalette: _colorPalette,
                                           label: 'Chose description color',
                                           defaultColor: snapshot.data.settings
-                                                  .containsKey(
-                                                      'description_color')
+                                              .containsKey(
+                                              'description_color')
                                               ? _parseColorFromString(snapshot
-                                                  .data
-                                                  .settings['description_color']
-                                                  .setting)
+                                              .data
+                                              .settings['description_color']
+                                              .setting)
                                               : _colorPalette[1]))
-                                  .then((Color color) =>
+                                      .then((Color color) =>
                                       _changeDescriptionColor(color));
-                            },
-                            color: snapshot.data.settings
+                                },
+                                color: snapshot.data.settings
                                     .containsKey('description_color')
-                                ? _parseColorFromString(snapshot
+                                    ? _parseColorFromString(snapshot
                                     .data.settings['description_color'].setting)
-                                : _colorPalette[1],
+                                    : _colorPalette[1],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                    MaterialButton(
-                      color: Theme.of(context).bottomAppBarColor,
-                      child: const Text('Restore defaults'),
-                      onPressed: () {
-                        _bloc.resetSettings();
-                      },
-                    ),
-                    MaterialButton(
-                      color: Theme.of(context).bottomAppBarColor,
-                      child: const Text('Delete all tasks'),
-                      onPressed: () => _onDeleteAllButton(),
-                    ),
-                  ],
-                  )
+                        ),
+                        MaterialButton(
+                          color: Theme
+                              .of(context)
+                              .bottomAppBarColor,
+                          child: const Text('Restore defaults'),
+                          onPressed: () {
+                            _bloc.resetSettings();
+                          },
+                        ),
+                        MaterialButton(
+                          color: Theme
+                              .of(context)
+                              .bottomAppBarColor,
+                          child: const Text('Delete all tasks'),
+                          onPressed: () => _onDeleteAllButton(),
+                        ),
+                      ],
+                    )
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -157,15 +167,17 @@ class SettingsDrawer extends StatelessWidget {
   }
 
   bool _isDarkModeEnable(BuildContext context) {
-    if (MediaQuery.of(context).platformBrightness == Brightness.dark) {
+    if (MediaQuery
+        .of(context)
+        .platformBrightness == Brightness.dark) {
       return true;
     } else {
       return false;
     }
   }
 
-  Future<Color> _showColorChoseDialog(
-          BuildContext context, ColorChooseDialog colorChooseDialog) async =>
+  Future<Color> _showColorChoseDialog(BuildContext context,
+      ColorChooseDialog colorChooseDialog) async =>
       showDialog<Color>(
           context: context,
           builder: (BuildContext context) => colorChooseDialog);
