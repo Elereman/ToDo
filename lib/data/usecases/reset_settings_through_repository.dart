@@ -11,7 +11,7 @@ class ResetSettingsUseCaseThroughRepository implements ResetSettingsUseCase {
   @override
   Future<Map<String, Setting<String>>> call() async {
     await _settingsProvider.resetAllSettings();
-    await _settingsProvider.resetAllSettings();
+    await _settingsProvider.requireAllSettings();
     final SettingsProviderState _settingsState =
         await _settingsProvider.stateStream.first;
     return _settingsState.settings;

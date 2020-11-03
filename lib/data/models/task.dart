@@ -1,27 +1,40 @@
 class TaskModel {
-  final int _id;
-  final int _color;
-  final String _task, _taskDescription;
+  final int _id, _color;
+  final String _text, _description;
   final bool _isCompleted;
 
-  TaskModel._(this._id, this._color, this._task, this._taskDescription,
-      this._isCompleted);
+  TaskModel(
+      {int id, int color, String text, String description, bool isCompleted})
+      : _id = id,
+        _color = color,
+        _text = text,
+        _description = description,
+        _isCompleted = isCompleted,
+        super();
 
   factory TaskModel.fromJson(Map<String, dynamic> json) {
-    return TaskModel._(
-      json['id'] as int,
-      json['color'] as int,
-      json['task'] as String,
-      json['description'] as String,
-      json['completed'] as bool,
+    return TaskModel(
+      id: json['id'] as int,
+      color: json['color'] as int,
+      text: json['text'] as String,
+      description: json['description'] as String,
+      isCompleted: json['completed'] as bool,
     );
   }
 
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': _id,
+        'text': _text,
+        'description': _description,
+        'color': _color,
+        'completed': _isCompleted,
+      };
+
   bool get isCompleted => _isCompleted;
 
-  String get taskDescription => _taskDescription;
+  String get description => _description;
 
-  String get task => _task;
+  String get text => _text;
 
   int get color => _color;
 

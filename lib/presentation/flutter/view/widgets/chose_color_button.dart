@@ -49,10 +49,12 @@ class _ChoseColorButtonState extends State<ChoseColorButton> {
       child: Text(widget._buttonText),
       onPressed: () {
         _showColorPicker(context).then((Color color) {
-          setState(() {
-            _color = color;
-          });
-          _onColorChosen(color);
+          if(color != null) {
+            setState(() {
+              _color = color;
+            });
+            _onColorChosen(color);
+          }
         });
       },
     );

@@ -1,36 +1,28 @@
 class Task {
   final int _id;
   final int _color;
-  final String _task, _taskDescription;
+  final String _text, _description;
   final bool _isCompleted;
 
   Task(
-      {String taskDescription = '',
-      String task = '',
+      {String description = '',
+      String text = '',
       int color = 0,
       bool isCompleted = false,
       int id = 0})
       : _id = id,
         _isCompleted = isCompleted,
         _color = color,
-        _task = task,
-        _taskDescription = taskDescription;
+        _text = text,
+        _description = description;
 
   bool get isCompleted => _isCompleted;
 
-  String get task => _task;
+  String get text => _text;
 
-  String get description => _taskDescription;
+  String get description => _description;
 
   int get id => _id;
 
   int get color => _color;
-
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': _id,
-        'task': _task,
-        'description': _taskDescription,
-        'color': _color,
-        'completed': _isCompleted,
-      };
 }

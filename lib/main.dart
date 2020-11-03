@@ -1,3 +1,5 @@
+import 'package:ToDo/core/assembly/abstract/task_entity.dart';
+import 'package:ToDo/core/assembly/concrete/task_entity_from_model.dart';
 import 'package:ToDo/data/usecases/create_task_through_repository.dart';
 import 'package:ToDo/data/usecases/edit_setting_through_repository.dart';
 import 'package:ToDo/data/usecases/reset_settings_through_repository.dart';
@@ -15,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/tools/settings_provider/settings_provider.dart';
-import 'data/repository/file_system_task.dart';
+import 'data/repository/file_system_task/repository.dart';
 import 'data/repository/shared_preferences_settings.dart';
 import 'data/usecases/delete_all_tasks_through_repository.dart';
 import 'data/usecases/delete_task_through_repository.dart';
@@ -38,16 +40,26 @@ class ToDoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: <Provider<dynamic>>[
-        Provider<TaskRepository>(create: (_) => FileSystemRepository()),
+        Provider<TaskEntityFactory>(
+          create: (_) => TaskEntityFromModelFactory(),
+        ),
+        Provider<TaskRepository>(
+            create: (BuildContext context) => FileSystemTaskRepository(
+                Provider.of<TaskEntityFactory>(context, listen: false))),
         Provider<SettingsRepository>(
-            create: (_) => SharedPreferencesSettingsRepository()),
+            create: (_) => SharedPreferencesSettingsRepository(<String, String>{
+                  'task_color': '4278190080',
+                  'description_color': '4288585374',
+                  'dark_mode': 'false',
+                })),
         Provider<SettingsProvider>(
           create: (BuildContext context) => SettingsProvider(
               Provider.of<SettingsRepository>(context, listen: false)),
         ),
         Provider<ResetSettingsUseCase>(
-          create: (BuildContext context) => ResetSettingsUseCaseThroughRepository(
-              Provider.of<SettingsProvider>(context, listen: false)),
+          create: (BuildContext context) =>
+              ResetSettingsUseCaseThroughRepository(
+                  Provider.of<SettingsProvider>(context, listen: false)),
         ),
         Provider<EditSettingUseCase>(
           create: (BuildContext context) => EditSettingUseCaseThroughRepository(
@@ -58,41 +70,58 @@ class ToDoApp extends StatelessWidget {
               Provider.of<SettingsProvider>(context, listen: false)),
         ),
         Provider<GetSettingsListUseCase>(
-          create: (BuildContext context) => GetSettingsListUseCaseThroughRepository(
-              Provider.of<SettingsProvider>(context, listen: false)),
+          create: (BuildContext context) =>
+              GetSettingsListUseCaseThroughRepository(
+                  Provider.of<SettingsProvider>(context, listen: false)),
         ),
         Provider<SettingsDrawerBloc>(
           create: (BuildContext context) => SettingsDrawerBloc(
-            resetSettingsListUseCase: Provider.of<ResetSettingsUseCase>(context, listen: false),
-            editSettingUseCase: Provider.of<EditSettingUseCase>(context, listen: false),
-            getSettingsListUseCase: Provider.of<GetSettingsListUseCase>(context, listen: false),
-            getSettingUseCase: Provider.of<GetSettingUseCase>(context, listen: false),
+            resetSettingsListUseCase:
+                Provider.of<ResetSettingsUseCase>(context, listen: false),
+            editSettingUseCase:
+                Provider.of<EditSettingUseCase>(context, listen: false),
+            getSettingsListUseCase:
+                Provider.of<GetSettingsListUseCase>(context, listen: false),
+            getSettingUseCase:
+                Provider.of<GetSettingUseCase>(context, listen: false),
           ),
         ),
         Provider<DeleteAllTasksUseCase>(
-          create: (BuildContext context) => DeleteAllTasksUseCaseThroughRepository(Provider.of<TaskRepository>(context, listen: false)),
+          create: (BuildContext context) =>
+              DeleteAllTasksUseCaseThroughRepository(
+                  Provider.of<TaskRepository>(context, listen: false)),
         ),
         Provider<GetAllTasksUseCase>(
-          create: (BuildContext context) => GetAllTasksUseCaseThroughRepository(Provider.of<TaskRepository>(context, listen: false)),
+          create: (BuildContext context) => GetAllTasksUseCaseThroughRepository(
+              Provider.of<TaskRepository>(context, listen: false)),
         ),
         Provider<EditTaskUseCase>(
-          create: (BuildContext context) => EditTaskUseCaseThroughRepository(Provider.of<TaskRepository>(context, listen: false)),
+          create: (BuildContext context) => EditTaskUseCaseThroughRepository(
+              Provider.of<TaskRepository>(context, listen: false)),
         ),
         Provider<DeleteTaskUseCase>(
-          create: (BuildContext context) => DeleteTaskUseCaseThroughRepository(Provider.of<TaskRepository>(context, listen: false)),
+          create: (BuildContext context) => DeleteTaskUseCaseThroughRepository(
+              Provider.of<TaskRepository>(context, listen: false)),
         ),
         Provider<CreateTaskUseCase>(
-          create: (BuildContext context) => CreateTaskUseCaseThroughRepository(Provider.of<TaskRepository>(context, listen: false)),
+          create: (BuildContext context) => CreateTaskUseCaseThroughRepository(
+              Provider.of<TaskRepository>(context, listen: false)),
         ),
         Provider<HomePageBloc>(
           create: (BuildContext context) => HomePageBloc(
-            deleteAllTasksUseCase: Provider.of<DeleteAllTasksUseCase>(context, listen: false),
-            getAllTasksUseCase: Provider.of<GetAllTasksUseCase>(context, listen: false),
-            editTaskUseCase: Provider.of<EditTaskUseCase>(context, listen: false),
-            deleteTaskUseCase: Provider.of<DeleteTaskUseCase>(context, listen: false),
-            createTaskUseCase: Provider.of<CreateTaskUseCase>(context, listen: false),
+            deleteAllTasksUseCase:
+                Provider.of<DeleteAllTasksUseCase>(context, listen: false),
+            getAllTasksUseCase:
+                Provider.of<GetAllTasksUseCase>(context, listen: false),
+            editTaskUseCase:
+                Provider.of<EditTaskUseCase>(context, listen: false),
+            deleteTaskUseCase:
+                Provider.of<DeleteTaskUseCase>(context, listen: false),
+            createTaskUseCase:
+                Provider.of<CreateTaskUseCase>(context, listen: false),
             repository: Provider.of<TaskRepository>(context, listen: false),
-            settingsProvider: Provider.of<SettingsProvider>(context, listen: false),
+            settingsProvider:
+                Provider.of<SettingsProvider>(context, listen: false),
           ),
         ),
         Provider<HomePage>(

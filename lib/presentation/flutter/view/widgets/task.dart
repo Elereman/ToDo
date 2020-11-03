@@ -26,7 +26,7 @@ class TaskWidget extends StatelessWidget {
         _onDismissed = onDismissed,
         _onPress = onPress,
         _onLongPress = onLongPress,
-        _taskText = task.task,
+        _taskText = task.text,
         _description = task.description,
         _isCompleted = task.isCompleted,
         super(
@@ -69,29 +69,26 @@ class TaskWidget extends StatelessWidget {
                   });
                 },
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    const Spacer(
-                      flex: 1,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          _taskText,
-                          style: TextStyle(color: _taskColor),
-                        ),
-                        Wrap(
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
+                            Text(
+                              _taskText,
+                              style: TextStyle(color: _taskColor),
+                            ),
                             Text(
                               _description,
                               style: TextStyle(color: _descriptionColor),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    const Spacer(
-                      flex: 27,
+                      ),
                     ),
                     Checkbox(
                         value: _isCompleted,
@@ -109,8 +106,8 @@ class TaskWidget extends StatelessWidget {
   }
 
   Task _changeTaskCompletedState(Task task) => Task(
-      task: task.task,
-      taskDescription: task.description,
+      text: task.text,
+      description: task.description,
       color: task.color,
       isCompleted: !task.isCompleted,
       id: task.id);
