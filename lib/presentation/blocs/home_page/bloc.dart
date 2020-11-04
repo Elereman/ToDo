@@ -45,7 +45,7 @@ class HomePageBloc {
     eventSubject.add(LoadTasksEvent(
         settingsProvider, GetAllTasksUseCaseThroughRepository(repository)));
     settingsProvider.stateStream.listen((SettingsProviderState state) {
-      if(_state != null) {
+      if (_state != null) {
         _state = HomePageState(_state.tasks, _state.state, state.settings);
         stateSubject.add(_state);
       }

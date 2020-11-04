@@ -10,7 +10,7 @@ class EditSettingUseCaseThroughRepository implements EditSettingUseCase {
   @override
   Future<Setting<String>> call(Setting<String> setting) async {
     await _settingsProvider.requireAllSettings();
-     _settingsProvider.editSetting(setting);
+    _settingsProvider.editSetting(setting);
     return _settingsProvider.editSetting(setting);
   }
 }

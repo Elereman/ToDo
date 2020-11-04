@@ -1,4 +1,6 @@
+import 'package:ToDo/core/assembly/abstract/setting_entity.dart';
 import 'package:ToDo/core/assembly/abstract/task_entity.dart';
+import 'package:ToDo/core/assembly/concrete/setting_entity_from_model.dart';
 import 'package:ToDo/core/assembly/concrete/task_entity_from_model.dart';
 import 'package:ToDo/data/usecases/create_task_through_repository.dart';
 import 'package:ToDo/data/usecases/edit_setting_through_repository.dart';
@@ -18,7 +20,7 @@ import 'package:provider/provider.dart';
 
 import 'core/tools/settings_provider/settings_provider.dart';
 import 'data/repository/file_system_task/repository.dart';
-import 'data/repository/shared_preferences_settings.dart';
+import 'data/repository/shared_preferences_settings/repository.dart';
 import 'data/usecases/delete_all_tasks_through_repository.dart';
 import 'data/usecases/delete_task_through_repository.dart';
 import 'data/usecases/edit_task_through_repository.dart';
@@ -43,15 +45,19 @@ class ToDoApp extends StatelessWidget {
         Provider<TaskEntityFactory>(
           create: (_) => TaskEntityFromModelFactory(),
         ),
+        Provider<SettingEntityFactory>(
+          create: (_) => SettingEntityFromModelFactory(),
+        ),
         Provider<TaskRepository>(
             create: (BuildContext context) => FileSystemTaskRepository(
                 Provider.of<TaskEntityFactory>(context, listen: false))),
         Provider<SettingsRepository>(
-            create: (_) => SharedPreferencesSettingsRepository(<String, String>{
+            create: (BuildContext context) =>
+                SharedPreferencesSettingsRepository(<String, String>{
                   'task_color': '4278190080',
                   'description_color': '4288585374',
                   'dark_mode': 'false',
-                })),
+                }, Provider.of<SettingEntityFactory>(context, listen: false))),
         Provider<SettingsProvider>(
           create: (BuildContext context) => SettingsProvider(
               Provider.of<SettingsRepository>(context, listen: false)),

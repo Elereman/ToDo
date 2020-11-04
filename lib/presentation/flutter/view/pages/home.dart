@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:ToDo/domain/entities/task.dart';
 import 'package:ToDo/presentation/blocs/home_page/bloc.dart';
 import 'package:ToDo/presentation/blocs/home_page/state.dart';
@@ -104,7 +102,7 @@ class HomePage extends StatelessWidget {
   }
 
   void _toggleDarkMode(BuildContext context, bool enabled) {
-    if(enabled) {
+    if (enabled) {
       DynamicTheme.of(context).setBrightness(Brightness.dark);
     } else {
       DynamicTheme.of(context).setBrightness(Brightness.light);

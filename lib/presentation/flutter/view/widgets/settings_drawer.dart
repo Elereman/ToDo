@@ -12,11 +12,12 @@ class SettingsDrawer extends StatelessWidget {
   final Function(BuildContext context, bool enabled) _onThemeSwitch;
   final SettingsDrawerBloc _bloc;
 
-  const SettingsDrawer({Key key,
-    Function onDeleteAllButton,
-    List<Color> colorPalette,
-    Function(BuildContext context, bool enabled) onThemeSwitch,
-    SettingsDrawerBloc bloc})
+  const SettingsDrawer(
+      {Key key,
+      Function onDeleteAllButton,
+      List<Color> colorPalette,
+      Function(BuildContext context, bool enabled) onThemeSwitch,
+      SettingsDrawerBloc bloc})
       : _onDeleteAllButton = onDeleteAllButton,
         _colorPalette = colorPalette,
         _onThemeSwitch = onThemeSwitch,
@@ -33,10 +34,9 @@ class SettingsDrawer extends StatelessWidget {
                 AsyncSnapshot<SettingsDrawerState> snapshot) {
               _bloc.getSettingsList();
               if (snapshot.hasData) {
-                final bool _isDarkModeEnabled = snapshot.data.settings
-                    .containsKey('dark_mode') &&
-                    snapshot.data.settings['dark_mode'].setting
-                        .parseBool();
+                final bool _isDarkModeEnabled =
+                    snapshot.data.settings.containsKey('dark_mode') &&
+                        snapshot.data.settings['dark_mode'].setting.parseBool();
                 Future<void>.delayed(Duration.zero, () async {
                   _changeTheme(_isDarkModeEnabled, context);
                 });
@@ -46,9 +46,7 @@ class SettingsDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
                         Container(
-                          color: Theme
-                              .of(context)
-                              .bottomAppBarColor,
+                          color: Theme.of(context).bottomAppBarColor,
                           child: const Padding(
                             padding: EdgeInsets.only(top: 10),
                             child: Text(
@@ -69,7 +67,7 @@ class SettingsDrawer extends StatelessWidget {
                                   onChanged: _isDarkModeEnable(context)
                                       ? null
                                       : (bool value) =>
-                                      _changeTheme(value, context)),
+                                          _changeTheme(value, context)),
                             ],
                           ),
                         ),
@@ -82,25 +80,27 @@ class SettingsDrawer extends StatelessWidget {
                               MaterialButton(
                                 onPressed: () {
                                   _showColorChoseDialog(
-                                      context,
-                                      ColorChooseDialog(
-                                          colorPalette: _colorPalette,
-                                          label: 'Chose task color',
-                                          defaultColor: snapshot.data.settings
-                                              .containsKey('task_color')
-                                              ? _parseColorFromString(snapshot
-                                              .data
-                                              .settings['task_color']
-                                              .setting)
-                                              : _colorPalette[0]))
-                                      .then(
-                                          (Color color) =>
+                                          context,
+                                          ColorChooseDialog(
+                                              colorPalette: _colorPalette,
+                                              label: 'Chose task color',
+                                              defaultColor: snapshot
+                                                      .data.settings
+                                                      .containsKey('task_color')
+                                                  ? _parseColorFromString(
+                                                      snapshot
+                                                          .data
+                                                          .settings[
+                                                              'task_color']
+                                                          .setting)
+                                                  : _colorPalette[0]))
+                                      .then((Color color) =>
                                           _changeTaskColor(color));
                                 },
-                                color:
-                                snapshot.data.settings.containsKey('task_color')
+                                color: snapshot.data.settings
+                                        .containsKey('task_color')
                                     ? _parseColorFromString(snapshot
-                                    .data.settings['task_color'].setting)
+                                        .data.settings['task_color'].setting)
                                     : _colorPalette[0],
                               ),
                             ],
@@ -115,49 +115,46 @@ class SettingsDrawer extends StatelessWidget {
                               MaterialButton(
                                 onPressed: () {
                                   _showColorChoseDialog(
-                                      context,
-                                      ColorChooseDialog(
-                                          colorPalette: _colorPalette,
-                                          label: 'Chose description color',
-                                          defaultColor: snapshot.data.settings
-                                              .containsKey(
-                                              'description_color')
-                                              ? _parseColorFromString(snapshot
-                                              .data
-                                              .settings['description_color']
-                                              .setting)
-                                              : _colorPalette[1]))
+                                          context,
+                                          ColorChooseDialog(
+                                              colorPalette: _colorPalette,
+                                              label: 'Chose description color',
+                                              defaultColor: snapshot
+                                                      .data.settings
+                                                      .containsKey(
+                                                          'description_color')
+                                                  ? _parseColorFromString(snapshot
+                                                      .data
+                                                      .settings[
+                                                          'description_color']
+                                                      .setting)
+                                                  : _colorPalette[1]))
                                       .then((Color color) =>
-                                      _changeDescriptionColor(color));
+                                          _changeDescriptionColor(color));
                                 },
                                 color: snapshot.data.settings
-                                    .containsKey('description_color')
-                                    ? _parseColorFromString(snapshot
-                                    .data.settings['description_color'].setting)
+                                        .containsKey('description_color')
+                                    ? _parseColorFromString(snapshot.data
+                                        .settings['description_color'].setting)
                                     : _colorPalette[1],
                               ),
                             ],
                           ),
                         ),
                         MaterialButton(
-                          color: Theme
-                              .of(context)
-                              .bottomAppBarColor,
+                          color: Theme.of(context).bottomAppBarColor,
                           child: const Text('Restore defaults'),
                           onPressed: () {
                             _bloc.resetSettings();
                           },
                         ),
                         MaterialButton(
-                          color: Theme
-                              .of(context)
-                              .bottomAppBarColor,
+                          color: Theme.of(context).bottomAppBarColor,
                           child: const Text('Delete all tasks'),
                           onPressed: () => _onDeleteAllButton(),
                         ),
                       ],
-                    )
-                );
+                    ));
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -167,17 +164,15 @@ class SettingsDrawer extends StatelessWidget {
   }
 
   bool _isDarkModeEnable(BuildContext context) {
-    if (MediaQuery
-        .of(context)
-        .platformBrightness == Brightness.dark) {
+    if (MediaQuery.of(context).platformBrightness == Brightness.dark) {
       return true;
     } else {
       return false;
     }
   }
 
-  Future<Color> _showColorChoseDialog(BuildContext context,
-      ColorChooseDialog colorChooseDialog) async =>
+  Future<Color> _showColorChoseDialog(
+          BuildContext context, ColorChooseDialog colorChooseDialog) async =>
       showDialog<Color>(
           context: context,
           builder: (BuildContext context) => colorChooseDialog);
