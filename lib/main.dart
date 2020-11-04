@@ -52,7 +52,8 @@ class ToDoApp extends StatelessWidget {
             create: (BuildContext context) => FileSystemTaskRepository(
                 Provider.of<TaskEntityFactory>(context, listen: false))),
         Provider<SettingsRepository>(
-            create: (_) => SharedPreferencesSettingsRepository(<String, String>{
+            create: (BuildContext context) =>
+                SharedPreferencesSettingsRepository(<String, String>{
                   'task_color': '4278190080',
                   'description_color': '4288585374',
                   'dark_mode': 'false',
